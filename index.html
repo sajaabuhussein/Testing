@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirecting...</title>
+    <title>Support Ticket Redirect</title>
 </head>
 <body>
+    <p>Loading Ticket Data, please wait...</p>
     <script>
-        // Replace TICKET_ID_HERE with the ID you got from the POST response
-        window.location.href = "https://bugbounty-exam.hashacademy.co/support/tickets/69e000a7bee6d6b7c6623eee";
+        // CHANGE THIS ID to the one you got from the Burp Response
+        const ticketId = "69e0064ebee6d6b7c662485d"; 
+        
+        setTimeout(function() {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/support/tickets/" + ticketId;
+        }, 500);
     </script>
 </body>
 </html>

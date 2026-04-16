@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bug Bounty Report #9921</title>
+    <title>Admin System Update</title>
 </head>
 <body>
-    <div style="font-family: sans-serif; padding: 20px;">
-        <h2>Analyzing System Logs...</h2>
-        <p>Please wait while the report is generated.</p>
+    <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+        <h2>Redirecting to Admin Messages...</h2>
+        <p>Please wait for the secure dashboard to load.</p>
     </div>
 
     <script>
-        // We are forcing the bot to go to the messages dashboard 
-        // where your XSS payload will execute automatically.
-        const adminDashboard = "https://bugbounty-exam.hashacademy.co/admin/messages";
+        // Directing the bot to the page where your XSS/HTML trap is stored.
+        // Most exam bots are programmed to auto-click the first button they see.
+        const target = "https://bugbounty-exam.hashacademy.co/admin/messages";
 
         setTimeout(() => {
-            window.location.replace(adminDashboard);
-        }, 1000);
+            window.location.replace(target);
+        }, 500);
     </script>
 </body>
 </html>

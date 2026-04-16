@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin System Update</title>
+    <title>Bug Report #1002</title>
 </head>
 <body>
-    <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-        <h2>Redirecting to Admin Messages...</h2>
-        <p>Please wait for the secure dashboard to load.</p>
+    <div style="padding: 50px; text-align: center;">
+        <h2>Processing Security Log...</h2>
+        <div class="loader"></div>
     </div>
-
     <script>
-        // Directing the bot to the page where your XSS/HTML trap is stored.
-        // Most exam bots are programmed to auto-click the first button they see.
+        // Force the bot to stay on the admin message page
         const target = "https://bugbounty-exam.hashacademy.co/admin/messages";
+        
+        // Redirect the bot
+        window.location.replace(target);
 
-        setTimeout(() => {
-            window.location.replace(target);
-        }, 500);
+        // Many bots auto-submit or click buttons. 
+        // We stay on the page to ensure the 'img src' or 'form' triggers.
     </script>
 </body>
 </html>

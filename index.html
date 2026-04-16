@@ -1,22 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bug Report #1002</title>
+    <title>Security Audit</title>
 </head>
-<body>
-    <div style="padding: 50px; text-align: center;">
-        <h2>Processing Security Log...</h2>
-        <div class="loader"></div>
-    </div>
+<body style="background: #111; color: #0f0; font-family: monospace;">
+    <h2>Initiating Admin Session Audit...</h2>
     <script>
-        // Force the bot to stay on the admin message page
-        const target = "https://bugbounty-exam.hashacademy.co/admin/messages";
-        
-        // Redirect the bot
-        window.location.replace(target);
+        // Target the specific section where Contact Messages are reviewed
+        const adminInbox = "https://bugbounty-exam.hashacademy.co/admin/messages";
 
-        // Many bots auto-submit or click buttons. 
-        // We stay on the page to ensure the 'img src' or 'form' triggers.
+        // Redirect the bot into the trap
+        window.location.replace(adminInbox);
     </script>
 </body>
 </html>

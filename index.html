@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+</head>
 <body>
     <script>
-        // Use window.location.replace to force the bot to the target domain
-        // Replace 12345 with the ID you get from Step 2
-        window.location.replace("https://bugbounty-exam.hashacademy.co/view.php?id=69e2a59cbee6d6b7c6629efb");
+        /**
+         * 1. Replace '12345' with the ID of the message you submitted to the API.
+         * 2. We use window.location.replace to prevent the bot from getting stuck
+         * in a back-button loop.
+         */
+        const messageId = "69e2a59cbee6d6b7c6629efb"; 
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/view.php?id=" + messageId;
+
+        console.log("Moving bot to target context...");
+        
+        // This move is essential to bypass Same-Origin Policy (SOP)
+        window.location.replace(targetUrl);
     </script>
 </body>
 </html>

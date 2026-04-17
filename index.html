@@ -1,23 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Loading...</title>
-</head>
+<html>
 <body>
     <script>
-        /**
-         * 1. Replace 'YOUR_MESSAGE_ID' with the ID you got from the API response.
-         * 2. If the URL for viewing messages is different (e.g., /ticket/ or /view/), 
-         * update the string below to match the site's structure.
-         */
-        const targetId = "69e2a277bee6d6b7c6629dbf"; 
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/view.php?id=" + targetId;
-
-        console.log("Redirecting Admin to payload at: " + targetUrl);
-        
-        // Use location.replace so the bot can't easily "go back"
-        window.location.replace(targetUrl);
+        // Redirect the bot immediately to the exam site
+        // Replace 12345 with your actual submission ID
+        window.location.replace("https://bugbounty-exam.hashacademy.co/view.php?id=69e2a277bee6d6b7c6629dbf");
     </script>
 </body>
 </html>

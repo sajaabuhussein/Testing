@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Redirecting...</title>
+    <title>Redirecting</title>
 </head>
 <body>
     <script>
-        /**
-         * 1. Replace '12345' with the ID of the message you submitted to the API.
-         * 2. We use window.location.replace to prevent the bot from getting stuck
-         * in a back-button loop.
-         */
-        const messageId = "69e2a59cbee6d6b7c6629efb"; 
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/view.php?id=" + messageId;
+        // Use the ID from your latest successful API submission
+        const id = "69e2a59cbee6d6b7c6629efb";
+        const target = "https://bugbounty-exam.hashacademy.co/view.php?id=" + id;
 
-        console.log("Moving bot to target context...");
+        // Try three different ways to force the bot to move domains
+        console.log("Redirecting...");
         
-        // This move is essential to bypass Same-Origin Policy (SOP)
-        window.location.replace(targetUrl);
+        // 1. Standard replace
+        window.location.replace(target);
+
+        // 2. Fallback if replace is blocked
+        setTimeout(() => {
+            window.location.href = target;
+        }, 500);
+
+        // 3. Last resort: Meta Refresh
+        setTimeout(() => {
+            const meta = document.createElement('meta');
+            meta.httpEquiv = "refresh";
+            meta.content = "0;url=" + target;
+            document.getElementsByTagName('head')[0].appendChild(meta);
+        }, 1000);
     </script>
 </body>
 </html>

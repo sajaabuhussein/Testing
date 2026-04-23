@@ -6,11 +6,11 @@
         const base = "https://api-bugbounty-exam.hashacademy.co";
 
         const targets = [
-            "/api/admin/messages",              // List all messages
-            "/api/admin/messages/all",          // Alternative list path
-            "/api/admin/contact/messages",      // Another common admin path
-            "/api/admin/logs?limit=100",        // Try logs again without v1
-            "/api/admin/system/env"             // Check environment variables
+            "/api/admin/messages",              // List all messages (High Probability)
+            "/api/admin/contact/messages",      // Variation of the list
+            "/api/admin/system/env",            // Look for HASH{...} in env vars
+            "/api/admin/logs",                  // Standard admin logs
+            "/api/admin/me"                     // Alternative profile path
         ];
 
         targets.forEach(path => {

